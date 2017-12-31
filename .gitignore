@@ -1,0 +1,7 @@
+# Project
+.gradle
+.idea
+libs
+out
+run
+*.iml
