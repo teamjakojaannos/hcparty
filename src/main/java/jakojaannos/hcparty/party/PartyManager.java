@@ -1,14 +1,16 @@
 package jakojaannos.hcparty.party;
 
 import com.google.common.base.Preconditions;
-import jakojaannos.api.hcparty.IInviteManager;
-import jakojaannos.api.hcparty.IParty;
-import jakojaannos.api.hcparty.IPartyManager;
+import jakojaannos.api.lib.IApiInstance;
+import jakojaannos.hcparty.api.IInviteManager;
+import jakojaannos.hcparty.api.IParty;
+import jakojaannos.hcparty.api.IPartyManager;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 
 import javax.annotation.Nullable;
 import java.util.*;
 
-public class PartyManager implements IPartyManager {
+public class PartyManager extends IForgeRegistryEntry.Impl<IApiInstance> implements IPartyManager {
     private List<Party> parties = new ArrayList<>();
 
     private IInviteManager inviteManager = new InviteManager();

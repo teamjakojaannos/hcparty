@@ -1,7 +1,7 @@
 package jakojaannos.hcparty.party;
 
 import com.google.common.base.Preconditions;
-import jakojaannos.api.hcparty.IParty;
+import jakojaannos.hcparty.api.IParty;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.util.INBTSerializable;

@@ -1,9 +1,8 @@
 package jakojaannos.hcparty.command;
 
 import com.google.common.base.Preconditions;
-import jakojaannos.api.hcparty.IParty;
-import jakojaannos.hcparty.party.Party;
-import jakojaannos.hcparty.party.PartyManager;
+import jakojaannos.hcparty.api.IParty;
+import jakojaannos.hcparty.api.IPartyManager;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
@@ -13,10 +12,6 @@ import java.util.List;
 import java.util.UUID;
 
 public class CommandDeclineParty extends CommandPartyBase {
-    CommandDeclineParty(PartyManager manager) {
-        super(manager);
-    }
-
     @Override
     public String getName() {
         return "decline";
@@ -28,7 +23,7 @@ public class CommandDeclineParty extends CommandPartyBase {
     }
 
     @Override
-    protected void execute(MinecraftServer server, ICommandSender sender, String[] args, PartyManager manager, UUID playerUuid) throws CommandException {
+    protected void execute(MinecraftServer server, ICommandSender sender, String[] args, IPartyManager manager, UUID playerUuid) throws CommandException {
         // Parse index from arguments
         int index = 0;
         if (args.length > 0) {
@@ -50,8 +45,7 @@ public class CommandDeclineParty extends CommandPartyBase {
             if (index < requests.size()) {
                 manager.getInviteManager().removeRequest(party, index);
                 sender.sendMessage(new TextComponentTranslation("commands.hcparty.decline.successrequest"));
-            }
-            else {
+            } else {
                 throw new CommandException("commands.hcparty.error.invalidid");
             }
         }
@@ -61,8 +55,7 @@ public class CommandDeclineParty extends CommandPartyBase {
             if (index < invites.size()) {
                 manager.getInviteManager().removeInvite(playerUuid, index);
                 sender.sendMessage(new TextComponentTranslation("commands.hcparty.decline.successinvite"));
-            }
-            else {
+            } else {
                 throw new CommandException("commands.hcparty.error.invalidid");
             }
         }

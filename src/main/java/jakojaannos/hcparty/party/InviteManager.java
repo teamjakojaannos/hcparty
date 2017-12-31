@@ -1,8 +1,8 @@
 package jakojaannos.hcparty.party;
 
 import com.google.common.collect.ImmutableList;
-import jakojaannos.api.hcparty.IInviteManager;
-import jakojaannos.api.hcparty.IParty;
+import jakojaannos.hcparty.api.IInviteManager;
+import jakojaannos.hcparty.api.IParty;
 
 import java.util.*;
 

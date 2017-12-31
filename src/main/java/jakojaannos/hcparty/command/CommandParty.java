@@ -1,6 +1,6 @@
 package jakojaannos.hcparty.command;
 
-import jakojaannos.hcparty.party.PartyManager;
+import jakojaannos.hcparty.api.IPartyManager;
 import net.minecraft.command.ICommandSender;
 import net.minecraftforge.server.command.CommandTreeBase;
 
@@ -15,13 +15,13 @@ public class CommandParty extends CommandTreeBase {
         return "commands.hcparty.usage";
     }
 
-    public CommandParty(PartyManager manager) {
-        addSubcommand(new CommandCreateParty(manager));
-        addSubcommand(new CommandJoinParty(manager));
-        addSubcommand(new CommandLeaveParty(manager));
-        addSubcommand(new CommandInviteParty(manager));
-        addSubcommand(new CommandListParty(manager));
-        addSubcommand(new CommandAcceptParty(manager));
-        addSubcommand(new CommandDeclineParty(manager));
+    public CommandParty() {
+        addSubcommand(new CommandCreateParty());
+        addSubcommand(new CommandJoinParty());
+        addSubcommand(new CommandLeaveParty());
+        addSubcommand(new CommandInviteParty());
+        addSubcommand(new CommandListParty());
+        addSubcommand(new CommandAcceptParty());
+        addSubcommand(new CommandDeclineParty());
     }
 }

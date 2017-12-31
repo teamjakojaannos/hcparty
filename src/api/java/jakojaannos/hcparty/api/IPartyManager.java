@@ -1,4 +1,7 @@
-package jakojaannos.api.hcparty;
+package jakojaannos.hcparty.api;
+
+import jakojaannos.api.lib.IApiInstance;
+import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
 
 import javax.annotation.Nullable;
 import java.util.UUID;
@@ -6,16 +9,12 @@ import java.util.UUID;
 /**
  * !!! DO NOT IMPLEMENT THIS INTERFACE !!!
  * <p>
- * Use provided static field {@link #INSTANCE} instead. That field gets
- * populated to a valid instance during pre-initialization.
- *
- * TODO: Investigate if creating custom registry for API instances would be feasible to implement
- *      - would allow @ObjectHolder("hcparty:apiPartyManager")
- *      - @ObjectHolders can be declared final...
- *      - ...which in turn would prevent anyone from fucking with the instance
- *      - ...unless they use ATs, reflection and/or black magic but that's just stupid
+ * Use provided static field {@link #INSTANCE} instead. That field gets populated to a valid instance during
+ * pre-initialization.
  */
-public interface IPartyManager {
+public interface IPartyManager extends IApiInstance {
+    // TODO: Investigate if this dies at runtime when API is in separate .jar
+    @ObjectHolder("hcparty:partymanager")
     IPartyManager INSTANCE = null;
 
     /**

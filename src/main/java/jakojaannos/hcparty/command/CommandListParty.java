@@ -1,9 +1,8 @@
 package jakojaannos.hcparty.command;
 
 import com.google.common.base.Preconditions;
-import jakojaannos.api.hcparty.IParty;
-import jakojaannos.hcparty.party.Party;
-import jakojaannos.hcparty.party.PartyManager;
+import jakojaannos.hcparty.api.IParty;
+import jakojaannos.hcparty.api.IPartyManager;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
@@ -13,10 +12,6 @@ import java.util.Collection;
 import java.util.UUID;
 
 public class CommandListParty extends CommandPartyBase {
-    CommandListParty(PartyManager manager) {
-        super(manager);
-    }
-
     @Override
     public String getName() {
         return "list";
@@ -28,7 +23,7 @@ public class CommandListParty extends CommandPartyBase {
     }
 
     @Override
-    protected void execute(MinecraftServer server, ICommandSender sender, String[] args, PartyManager manager, UUID playerUuid) throws CommandException {
+    protected void execute(MinecraftServer server, ICommandSender sender, String[] args, IPartyManager manager, UUID playerUuid) throws CommandException {
         StringBuilder builder = new StringBuilder();
 
         // Add list of party members (if in a party)

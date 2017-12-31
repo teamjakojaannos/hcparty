@@ -1,6 +1,6 @@
 package jakojaannos.hcparty.command;
 
-import jakojaannos.hcparty.party.PartyManager;
+import jakojaannos.hcparty.api.IPartyManager;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
@@ -9,10 +9,6 @@ import net.minecraft.util.text.TextComponentTranslation;
 import java.util.UUID;
 
 public class CommandLeaveParty extends CommandPartyBase {
-    CommandLeaveParty(PartyManager manager) {
-        super(manager);
-    }
-
     @Override
     public String getName() {
         return "leave";
@@ -24,7 +20,7 @@ public class CommandLeaveParty extends CommandPartyBase {
     }
 
     @Override
-    protected void execute(MinecraftServer server, ICommandSender sender, String[] args, PartyManager manager, UUID playerUuid) throws CommandException {
+    protected void execute(MinecraftServer server, ICommandSender sender, String[] args, IPartyManager manager, UUID playerUuid) throws CommandException {
         // Make sure player is currently in a party
         if (!manager.isInParty(playerUuid)) {
             throw new CommandException("commands.hcparty.error.notinparty");

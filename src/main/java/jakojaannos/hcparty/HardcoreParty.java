@@ -1,17 +1,19 @@
 package jakojaannos.hcparty;
 
-import jakojaannos.hcparty.command.CommandParty;
-import jakojaannos.hcparty.party.PartyManager;
-import jakojaannos.lib.init.BiomesBase;
-import jakojaannos.lib.init.BlocksBase;
-import jakojaannos.lib.init.ItemsBase;
-import jakojaannos.lib.mod.ModMainBase;
+import jakojaannos.api.mod.BiomesBase;
+import jakojaannos.api.mod.BlocksBase;
+import jakojaannos.api.mod.ItemsBase;
+import jakojaannos.api.mod.ModMainBase;
+import jakojaannos.hcparty.init.HCPartyCommands;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.*;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 
 @Mod(modid = ModInfo.MODID, name = ModInfo.NAME, version = ModInfo.VERSION, dependencies = ModInfo.DEPENDENCIES)
-public class HardcoreParty extends ModMainBase<HardcoreParty, BlocksBase, ItemsBase, BiomesBase> {
+public class HardcoreParty extends ModMainBase<BlocksBase, ItemsBase, BiomesBase, HCPartyCommands> {
 
     @SidedProxy(clientSide = "jakojaannos.hcparty.client.ClientProxy", serverSide = "jakojaannos.hcparty.CommonProxy")
     public static CommonProxy proxy;
@@ -19,16 +21,10 @@ public class HardcoreParty extends ModMainBase<HardcoreParty, BlocksBase, ItemsB
     @Mod.Instance
     public static HardcoreParty instance;
 
-
-    public final PartyManager partyManager;
-
-    public HardcoreParty() {
-        partyManager = new PartyManager();
-    }
-
     @Mod.EventHandler
+    @Override
     public void onServerStarting(FMLServerStartingEvent event) {
-        event.registerServerCommand(new CommandParty(partyManager));
+        super.onServerStarting(event);
     }
 
     @Mod.EventHandler
