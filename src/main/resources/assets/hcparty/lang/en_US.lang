@@ -37,4 +37,3 @@ commands.hcparty.decline.usage=Use /hcparty decline [requestId] to decline reque
 commands.hcparty.decline.error.empty=Nothing to decline!
 commands.hcparty.decline.successrequest=Request declined
 commands.hcparty.decline.successinvite=Invite declined
-

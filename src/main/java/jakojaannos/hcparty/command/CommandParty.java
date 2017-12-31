@@ -1,6 +1,5 @@
 package jakojaannos.hcparty.command;
 
-import jakojaannos.hcparty.api.IPartyManager;
 import net.minecraft.command.ICommandSender;
 import net.minecraftforge.server.command.CommandTreeBase;
 
