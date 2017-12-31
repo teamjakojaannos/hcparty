@@ -2,6 +2,7 @@ package jakojaannos.hcparty.command;
 
 import net.minecraft.command.ICommandSender;
 import net.minecraftforge.server.command.CommandTreeBase;
+import net.minecraftforge.server.command.CommandTreeHelp;
 
 public class CommandParty extends CommandTreeBase {
     @Override
@@ -14,6 +15,11 @@ public class CommandParty extends CommandTreeBase {
         return "commands.hcparty.usage";
     }
 
+    @Override
+    public int getRequiredPermissionLevel() {
+        return 0;
+    }
+
     public CommandParty() {
         addSubcommand(new CommandCreateParty());
         addSubcommand(new CommandJoinParty());
@@ -22,5 +28,6 @@ public class CommandParty extends CommandTreeBase {
         addSubcommand(new CommandListParty());
         addSubcommand(new CommandAcceptParty());
         addSubcommand(new CommandDeclineParty());
+        addSubcommand(new CommandTreeHelp(this));
     }
 }

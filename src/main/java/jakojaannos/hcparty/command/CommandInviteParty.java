@@ -30,7 +30,7 @@ public class CommandInviteParty extends CommandPartyBase {
         UUID targetUuid = findUUIDByName(server, args[0]);
 
         // Make sure target player is currently not in a party
-        if (!manager.isInParty(targetUuid)) {
+        if (manager.isInParty(targetUuid)) {
             throw new CommandException("commands.hcparty.error.notinparty");
         }
 

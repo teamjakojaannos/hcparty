@@ -6,6 +6,7 @@ import jakojaannos.hcparty.api.IPartyManager;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.translation.I18n;
 
 import java.util.Collection;
@@ -89,6 +90,9 @@ public class CommandListParty extends CommandPartyBase {
                 }
             }
         }
+
+        // Print out the message
+        sender.sendMessage(new TextComponentTranslation(builder.toString()));
     }
 
 
