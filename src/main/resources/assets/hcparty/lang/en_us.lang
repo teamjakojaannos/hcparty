@@ -11,14 +11,12 @@ commands.hcparty.join.error.notinparty=Target player is not in party!
 commands.hcparty.join.success=Request to join the party sent! Please wait until party leader accepts your request.
 
 commands.hcparty.invite.usage=Use /hcparty invite <player> to invite a player to your party.
-commands.hcparty.invite.error.player=No such player!
+commands.hcparty.invite.success=Invite sent!
 
 commands.hcparty.leave.usage=Use /hcparty leave to leave current party
 commands.hcparty.leave.success=You left the party
 
 commands.hcparty.create.usage=Use /hcparty create to create a new party.
-commands.hcparty.create.error.inparty=Already in a party! Leave your old party first using /hcparty leave
-commands.hcparty.create.error.name=Party with that name already exists!
 commands.hcparty.create.success=Created a party, you are now party leader. Use /hcparty invite to invite other players to your party
 
 commands.hcparty.list.usage=Use /hcparty list to get list of current party members and join requests or party invites
