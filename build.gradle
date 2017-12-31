@@ -70,3 +70,11 @@ jar {
         attributes 'FMLAT': 'hcparty_at.cfg'
     }
 }
+
+task apiJar(type: Jar, dependsOn: reobfJar) {
+    destinationDir = libsDir
+    appendix = "api"
+    from sourceSets.api.output
+}
+
+build.dependsOn apiJar
