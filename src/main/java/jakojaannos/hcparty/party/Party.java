@@ -1,6 +1,7 @@
 package jakojaannos.hcparty.party;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import jakojaannos.hcparty.api.IParty;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -9,57 +10,61 @@ import net.minecraftforge.common.util.INBTSerializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
-public class Party implements IParty, INBTSerializable<NBTTagCompound> {
-    private List<PartyMember> members = new ArrayList<>();
+class Party implements IParty, INBTSerializable<NBTTagCompound> {
+    private byte id;
 
-    @Override
-    public List<UUID> getMembers() {
-        return members.stream()
-                .map(member -> member.uuid)
-                .collect(Collectors.toList());
+    private List<UUID> members = new ArrayList<>();
+    private int leaderIndex = 0;
+
+    Party(byte id, UUID leader) {
+        this.id = id;
+        addMember(leader);
     }
 
     @Override
-    public boolean isLeader(UUID playerUuid) {
-        return members.stream()
-                .anyMatch(member -> member.uuid == playerUuid && member.isLeader);
+    public byte getId() {
+        return id;
     }
 
     @Override
-    public List<UUID> getLeaders() {
-        return members.stream()
-                .filter(member -> member.isLeader)
-                .map(member -> member.uuid)
-                .collect(Collectors.toList());
+    public ImmutableList<UUID> getMembers() {
+        return ImmutableList.copyOf(members);
     }
 
     @Override
-    public boolean isMember(UUID playerUuid) {
-        return members.stream().anyMatch(member -> member.uuid == playerUuid);
+    public UUID getLeader() {
+        Preconditions.checkElementIndex(leaderIndex, members.size());
+        return members.get(leaderIndex);
     }
 
+    @Override
+    public void setLeader(UUID playerUuid) {
+        if (isMember(playerUuid)) {
+            leaderIndex = members.indexOf(playerUuid);
+        }
+    }
 
     @Override
-    public void addMember(UUID playerUuid, boolean isLeader) {
-        Preconditions.checkState(!isMember(playerUuid));
-        members.add(new PartyMember(playerUuid, isLeader));
+    public void addMember(UUID playerUuid) {
+        if (isMember(playerUuid)) {
+            return;
+        }
+
+        members.add(playerUuid);
+        PartyManager.INSTANCE.onPlayerAdded(playerUuid, this);
     }
 
     @Override
     public void removeMember(UUID playerUuid) {
-        int index = -1;
-        for (int i = 0; i < members.size(); i++) {
-            if (members.get(i).uuid == playerUuid) {
-                index = i;
-                break;
-            }
+        if (!isMember(playerUuid)) {
+            return;
         }
 
-        if (index != -1) {
-            members.remove(index);
-        }
+        boolean wasLeader = isLeader(playerUuid);
+        members.remove(playerUuid);
+
+        PartyManager.INSTANCE.onPlayerRemoved(playerUuid, this, wasLeader);
     }
 
 
@@ -69,10 +74,16 @@ public class Party implements IParty, INBTSerializable<NBTTagCompound> {
 
         // Write members
         NBTTagList list = new NBTTagList();
-        for (PartyMember member : members) {
-            list.appendTag(member.serializeNBT());
+        for (UUID uuid : members) {
+            NBTTagCompound memberCompound = new NBTTagCompound();
+            memberCompound.setUniqueId("uuid", uuid);
+            list.appendTag(memberCompound);
         }
         compound.setTag("members", list);
+
+        // Write other info
+        compound.setInteger("leader", leaderIndex);
+        compound.setByte("partyid", id);
 
         return compound;
     }
@@ -82,37 +93,22 @@ public class Party implements IParty, INBTSerializable<NBTTagCompound> {
         // Read members
         NBTTagList memberTags = nbt.getTagList("members", 10); // 10 => Compound
         for (int i = 0; i < memberTags.tagCount(); i++) {
-            PartyMember member = new PartyMember();
-            member.deserializeNBT(memberTags.getCompoundTagAt(i));
-            members.add(member);
+            members.add(memberTags.getCompoundTagAt(i).getUniqueId("uuid"));
         }
+
+        // Read other info
+        id = nbt.getByte("partyid");
+        leaderIndex = nbt.getInteger("leader");
     }
 
 
-    private static class PartyMember implements INBTSerializable<NBTTagCompound> {
-        UUID uuid;
-        boolean isLeader;
+    @Override
+    public int hashCode() {
+        return id;
+    }
 
-        PartyMember() {
-        }
-
-        PartyMember(UUID playerUuid, boolean isLeader) {
-            this.uuid = playerUuid;
-            this.isLeader = isLeader;
-        }
-
-        @Override
-        public NBTTagCompound serializeNBT() {
-            NBTTagCompound compound = new NBTTagCompound();
-            compound.setUniqueId("uuid", uuid);
-            compound.setBoolean("isLeader", isLeader);
-            return compound;
-        }
-
-        @Override
-        public void deserializeNBT(NBTTagCompound nbt) {
-            uuid = nbt.getUniqueId("uuid");
-            isLeader = nbt.getBoolean("isLeader");
-        }
+    @Override
+    public boolean equals(Object obj) {
+        return obj != null && obj instanceof IParty && ((IParty) obj).getId() == this.id;
     }
 }

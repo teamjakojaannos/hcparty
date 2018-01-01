@@ -1,5 +1,6 @@
 package jakojaannos.hcparty.command;
 
+import jakojaannos.hcparty.api.IInviteManager;
 import jakojaannos.hcparty.api.IPartyManager;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -20,14 +21,14 @@ public class CommandLeaveParty extends CommandPartyBase {
     }
 
     @Override
-    protected void execute(MinecraftServer server, ICommandSender sender, String[] args, IPartyManager manager, UUID playerUuid) throws CommandException {
+    protected void execute(MinecraftServer server, ICommandSender sender, String[] args, IPartyManager manager, IInviteManager inviteManager, UUID playerUuid) throws CommandException {
         // Make sure player is currently in a party
         if (!manager.isInParty(playerUuid)) {
             throw new CommandException("commands.hcparty.error.notinparty");
         }
 
         // Validation done, leave party
-        manager.removePlayerFromParty(playerUuid);
+        manager.getParty(playerUuid).removeMember(playerUuid);
         sender.sendMessage(new TextComponentTranslation("commands.hcparty.leave.success"));
     }
 }

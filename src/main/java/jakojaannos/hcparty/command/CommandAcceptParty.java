@@ -1,6 +1,7 @@
 package jakojaannos.hcparty.command;
 
 import com.google.common.base.Preconditions;
+import jakojaannos.hcparty.api.IInviteManager;
 import jakojaannos.hcparty.api.IParty;
 import jakojaannos.hcparty.api.IPartyManager;
 import net.minecraft.command.CommandException;
@@ -23,7 +24,7 @@ public class CommandAcceptParty extends CommandPartyBase {
     }
 
     @Override
-    protected void execute(MinecraftServer server, ICommandSender sender, String[] args, IPartyManager manager, UUID playerUuid) throws CommandException {
+    protected void execute(MinecraftServer server, ICommandSender sender, String[] args, IPartyManager manager, IInviteManager inviteManager, UUID playerUuid) throws CommandException {
         // Parse index from arguments
         int index = 0;
         if (args.length > 0) {
@@ -32,7 +33,7 @@ public class CommandAcceptParty extends CommandPartyBase {
 
         // In a party, accepting requests
         if (manager.isInParty(playerUuid)) {
-            final IParty party = manager.getCurrentParty(playerUuid);
+            final IParty party = manager.getParty(playerUuid);
             Preconditions.checkNotNull(party);
 
             // Only party leader can accept requests
@@ -41,16 +42,14 @@ public class CommandAcceptParty extends CommandPartyBase {
                 throw new CommandException("commands.hcparty.error.notleader");
             }
 
-            List<UUID> requests = manager.getInviteManager().getPendingRequests(party);
+            List<UUID> requests = inviteManager.getPendingRequests(party);
             if (requests.size() == 0) {
                 throw new CommandException("commands.hcparty.accept.error.empty");
             }
 
             if (index < requests.size()) {
                 UUID target = requests.get(index);
-                manager.addPlayerToParty(target, party, false);
-                manager.getInviteManager().clearInvites(target);
-                manager.getInviteManager().clearRequests(target);
+                inviteManager.acceptProposal(target, party);
                 sender.sendMessage(new TextComponentTranslation("commands.hcparty.accept.successrequest"));
             } else {
                 throw new CommandException("commands.hcparty.error.invalidid");
@@ -58,15 +57,13 @@ public class CommandAcceptParty extends CommandPartyBase {
         }
         // Not in a party, accepting invites
         else {
-            List<IParty> invites = manager.getInviteManager().getPendingInvites(playerUuid);
+            List<IParty> invites = inviteManager.getPendingInvites(playerUuid);
             if (invites.size() == 0) {
                 throw new CommandException("commands.hcparty.accept.error.empty");
             }
 
             if (index < invites.size()) {
-                manager.addPlayerToParty(playerUuid, invites.get(index), false);
-                manager.getInviteManager().clearInvites(playerUuid);
-                manager.getInviteManager().clearRequests(playerUuid);
+                inviteManager.acceptProposal(playerUuid, invites.get(index));
                 sender.sendMessage(new TextComponentTranslation("commands.hcparty.accept.successinvite"));
             } else {
                 throw new CommandException("commands.hcparty.error.invalidid");

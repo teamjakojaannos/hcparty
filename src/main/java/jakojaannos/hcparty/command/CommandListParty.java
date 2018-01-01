@@ -1,6 +1,7 @@
 package jakojaannos.hcparty.command;
 
 import com.google.common.base.Preconditions;
+import jakojaannos.hcparty.api.IInviteManager;
 import jakojaannos.hcparty.api.IParty;
 import jakojaannos.hcparty.api.IPartyManager;
 import net.minecraft.command.CommandException;
@@ -24,7 +25,7 @@ public class CommandListParty extends CommandPartyBase {
     }
 
     @Override
-    protected void execute(MinecraftServer server, ICommandSender sender, String[] args, IPartyManager manager, UUID playerUuid) throws CommandException {
+    protected void execute(MinecraftServer server, ICommandSender sender, String[] args, IPartyManager manager, IInviteManager inviteManager, UUID playerUuid) throws CommandException {
         StringBuilder builder = new StringBuilder();
 
         // Add list of party members (if in a party)
@@ -34,7 +35,7 @@ public class CommandListParty extends CommandPartyBase {
             builder.append("\n");
 
             // Add members
-            final IParty party = manager.getCurrentParty(playerUuid);
+            final IParty party = manager.getParty(playerUuid);
             Preconditions.checkNotNull(party);
             for (UUID uuid : party.getMembers()) {
                 // Prefix leader with ' L ', normal party members with ' - '
@@ -49,7 +50,7 @@ public class CommandListParty extends CommandPartyBase {
             }
 
             // Add list of invited players
-            final Collection<UUID> invited = manager.getInviteManager().getPendingRequests(party);
+            final Collection<UUID> invited = inviteManager.getPendingRequests(party);
             if (!invited.isEmpty()) {
                 builder.append("\n");
                 appendTitle(builder, "commands.hcparty.list.text.invited");
@@ -62,7 +63,7 @@ public class CommandListParty extends CommandPartyBase {
             }
 
             // Add list of players requesting to join
-            final Collection<UUID> requests = manager.getInviteManager().getPendingRequests(party);
+            final Collection<UUID> requests = inviteManager.getPendingRequests(party);
             if (!requests.isEmpty()) {
                 builder.append("\n");
                 appendTitle(builder, "commands.hcparty.list.text.requests");
@@ -78,14 +79,14 @@ public class CommandListParty extends CommandPartyBase {
             builder.append("\n");
 
             // Add list of pending invites
-            final Collection<IParty> invites = manager.getInviteManager().getPendingInvites(playerUuid);
+            final Collection<IParty> invites = inviteManager.getPendingInvites(playerUuid);
             if (!invites.isEmpty()) {
                 builder.append("\n");
                 appendTitle(builder, "commands.hcparty.list.text.invites");
 
                 int index = 0;
                 for (IParty party : invites) {
-                    appendPlayerName(builder, index, getNameByUUID(server, party.getLeaders().get(0)));
+                    appendPlayerName(builder, index, getNameByUUID(server, party.getLeader()));
                     index++;
                 }
             }

@@ -1,5 +1,6 @@
 package jakojaannos.hcparty.command;
 
+import jakojaannos.hcparty.api.IInviteManager;
 import jakojaannos.hcparty.api.IPartyManager;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -20,7 +21,7 @@ public class CommandCreateParty extends CommandPartyBase {
     }
 
     @Override
-    public void execute(MinecraftServer server, ICommandSender sender, String[] args, IPartyManager manager, UUID playerUuid) throws CommandException {
+    public void execute(MinecraftServer server, ICommandSender sender, String[] args, IPartyManager manager, IInviteManager inviteManager, UUID playerUuid) throws CommandException {
         // Make sure player is currently not in a party
         if (manager.isInParty(playerUuid)) {
             throw new CommandException("commands.hcparty.error.inparty");

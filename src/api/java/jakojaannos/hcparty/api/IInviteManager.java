@@ -1,46 +1,49 @@
 package jakojaannos.hcparty.api;
 
-import java.util.List;
+import com.google.common.collect.ImmutableList;
+import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
+
 import java.util.UUID;
 
-public interface IInviteManager {
-    /**
-     * Invites the player to the party
-     */
-    void inviteToParty(UUID playerUuid, IParty party);
+/**
+ * <b>!!! DO NOT IMPLEMENT THIS INTERFACE !!!</b>
+ * <p>
+ * Use {@link ObjectHolder @ObjectHolder(IInviteManager.REGISTRY_KEY)} to get an instance instead.
+ * <p>
+ * Provides invite-handling for the IPartyManager.
+ * <p>
+ * Internally, the system calls invites and join requests "proposals". When player makes request to join a party, they
+ * make proposal for them to join the party. When party leader invites someone to the party, they make proposal for the
+ * target player to join the party. This removes the need for handling the invites/requests separately in most cases.
+ * <p>
+ */
+public interface IInviteManager /* extends IApiInstance */ {
+    String REGISTRY_KEY = "hcparty:invitemanager";
+    @ObjectHolder(REGISTRY_KEY)  IInviteManager INSTANCE = null;
+
+
+    boolean hasPendingInvites(UUID playerUuid);
+
+    boolean hasPendingRequests(IParty party);
+
+    ImmutableList<IParty> getPendingInvites(UUID playerUuid);
+
+    ImmutableList<UUID> getPendingRequests(IParty party);
+
 
     /**
-     * Sends the party a join request
+     * Adds proposal for adding player to the party. If proposals are made symmetrically for invite and request,
+     * situation is counted as accepted proposal.
      */
-    void requestToJoinParty(UUID playerUuid, IParty party);
+    void addProposal(UUID player, IParty party, boolean isInvite);
+
+    void acceptProposal(UUID player, IParty party);
+
+    void rejectProposal(UUID player, IParty party);
+
 
     /**
-     * Removes all invites a player has received
+     * Resets the invite manager. Clears all pending requests and invites
      */
-    void clearInvites(UUID playerUuid);
-
-    /**
-     * Removes all requests a player has sent
-     */
-    void clearRequests(UUID playerUuid);
-
-    /**
-     * Removes the invite at given index
-     */
-    void removeInvite(UUID playerUuid, int index);
-
-    /**
-     * Removes the request at given index
-     */
-    void removeRequest(IParty party, int index);
-
-    /**
-     * Gets a list of pending invites to join parties
-     */
-    List<IParty> getPendingInvites(UUID playerUuid);
-
-    /**
-     * Gets a list of pending requests to join the party
-     */
-    List<UUID> getPendingRequests(IParty party);
+    void reset();
 }

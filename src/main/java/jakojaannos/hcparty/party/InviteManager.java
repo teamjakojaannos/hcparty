@@ -1,80 +1,100 @@
 package jakojaannos.hcparty.party;
 
 import com.google.common.collect.ImmutableList;
+import jakojaannos.api.lib.IApiInstance;
 import jakojaannos.hcparty.api.IInviteManager;
 import jakojaannos.hcparty.api.IParty;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
-public class InviteManager implements IInviteManager {
+public class InviteManager extends IForgeRegistryEntry.Impl<IApiInstance> implements IInviteManager {
 
-    private Map<UUID, List<IParty>> invites = new HashMap<>();
-    private Map<IParty, List<UUID>> requests = new HashMap<>();
+    private List<Proposal> proposals = new ArrayList<>();
 
     @Override
-    public void inviteToParty(UUID playerUuid, IParty party) {
-        if (getInviteList(playerUuid).contains(party)) {
+    public boolean hasPendingInvites(UUID playerUuid) {
+        return proposals.stream()
+                .filter(Proposal::isInvite)
+                .anyMatch(proposal -> proposal.getPlayer().equals(playerUuid));
+    }
+
+    @Override
+    public boolean hasPendingRequests(IParty party) {
+        return proposals.stream()
+                .filter(Proposal::isRequest)
+                .anyMatch(proposal -> proposal.getParty().equals(party));
+    }
+
+    @Override
+    public ImmutableList<IParty> getPendingInvites(UUID playerUuid) {
+        return ImmutableList.copyOf(proposals.stream()
+                .filter(Proposal::isInvite)
+                .filter(proposal -> proposal.getPlayer().equals(playerUuid))
+                .map(Proposal::getParty)
+                .collect(Collectors.toList()));
+    }
+
+    @Override
+    public ImmutableList<UUID> getPendingRequests(IParty party) {
+        return ImmutableList.copyOf(proposals.stream()
+                .filter(Proposal::isRequest)
+                .filter(proposal -> proposal.getParty().equals(party))
+                .map(Proposal::getPlayer)
+                .collect(Collectors.toList()));
+    }
+
+    @Override
+    public void addProposal(UUID player, IParty party, boolean isInvite) {
+        // Ignore duplicate proposals, accept symmetric proposals
+        if (proposals.stream().anyMatch(p -> p.getPlayer().equals(player) && p.getParty().equals(party) && p.isInvite() != isInvite)) {
+            acceptProposal(player, party);
+            return;
+        } else if (proposals.stream().anyMatch(p -> p.getPlayer().equals(player) && p.getParty().equals(party) && p.isInvite() == isInvite)) {
             return;
         }
 
-        getInviteList(playerUuid).add(party);
+        proposals.add(new Proposal(player, party, isInvite));
     }
 
     @Override
-    public void requestToJoinParty(UUID playerUuid, IParty party) {
-        if (getRequestList(party).contains(playerUuid)) {
+    public void acceptProposal(UUID player, IParty party) {
+        Proposal proposal = proposals.stream()
+                .filter(p -> p.getPlayer().equals(player) && p.getParty().equals(party))
+                .findAny()
+                .orElse(null);
+
+        if (proposal == null) {
             return;
         }
 
-        getRequestList(party).add(playerUuid);
+        // Remove all entries with player in them
+        proposals = proposals.stream()
+                .filter(p -> !p.getPlayer().equals(player))
+                .collect(Collectors.toList());
+
+        party.addMember(player);
     }
 
     @Override
-    public void clearInvites(UUID playerUuid) {
-        getInviteList(playerUuid).clear();
-    }
+    public void rejectProposal(UUID player, IParty party) {
+        Proposal proposal = proposals.stream()
+                .filter(p -> p.getPlayer().equals(player) && p.getParty().equals(party))
+                .findAny()
+                .orElse(null);
 
-    @Override
-    public void clearRequests(UUID playerUuid) {
-        for (IParty party : requests.keySet()) {
-            getRequestList(party).remove(playerUuid);
-        }
-    }
-
-    @Override
-    public void removeInvite(UUID playerUuid, int index) {
-        getInviteList(playerUuid).remove(index);
-    }
-
-    @Override
-    public void removeRequest(IParty party, int index) {
-        getRequestList(party).remove(index);
-    }
-
-    @Override
-    public List<IParty> getPendingInvites(UUID playerUuid) {
-        return ImmutableList.copyOf(getInviteList(playerUuid));
-    }
-
-    @Override
-    public List<UUID> getPendingRequests(IParty party) {
-        return ImmutableList.copyOf(getRequestList(party));
-    }
-
-
-    private List<IParty> getInviteList(UUID uuid) {
-        if (!invites.containsKey(uuid)) {
-            invites.put(uuid, new ArrayList<>());
+        if (proposal == null) {
+            return;
         }
 
-        return invites.get(uuid);
+        proposals.remove(proposal);
     }
 
-    private List<UUID> getRequestList(IParty party) {
-        if (!requests.containsKey(party)) {
-            requests.put(party, new ArrayList<>());
-        }
-
-        return requests.get(party);
+    @Override
+    public void reset() {
+        proposals.clear();
     }
 }

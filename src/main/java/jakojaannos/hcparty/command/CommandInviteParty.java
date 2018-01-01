@@ -1,5 +1,6 @@
 package jakojaannos.hcparty.command;
 
+import jakojaannos.hcparty.api.IInviteManager;
 import jakojaannos.hcparty.api.IParty;
 import jakojaannos.hcparty.api.IPartyManager;
 import net.minecraft.command.CommandException;
@@ -22,7 +23,7 @@ public class CommandInviteParty extends CommandPartyBase {
     }
 
     @Override
-    protected void execute(MinecraftServer server, ICommandSender sender, String[] args, IPartyManager manager, UUID playerUuid) throws CommandException {
+    protected void execute(MinecraftServer server, ICommandSender sender, String[] args, IPartyManager manager, IInviteManager inviteManager, UUID playerUuid) throws CommandException {
         // Validate the player name passed in as argument
         if (args.length < 1) {
             throw new WrongUsageException(getUsage(sender));
@@ -34,11 +35,11 @@ public class CommandInviteParty extends CommandPartyBase {
             throw new CommandException("commands.hcparty.error.notinparty");
         }
 
-        // Make sure player is in a party
-        final IParty party = manager.getCurrentParty(playerUuid);
+        // Make sure inviting player is in a party
+        final IParty party = manager.getParty(playerUuid);
         if (party != null) {
-            // Validation done, join party
-            manager.getInviteManager().inviteToParty(targetUuid, party);
+            // Validation done, invite to party
+            inviteManager.addProposal(targetUuid, party, true);
             sender.sendMessage(new TextComponentTranslation("commands.hcparty.invite.success"));
         } else {
             throw new CommandException("commands.hcparty.error.notinparty");

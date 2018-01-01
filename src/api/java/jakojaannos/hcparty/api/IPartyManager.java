@@ -7,20 +7,14 @@ import javax.annotation.Nullable;
 import java.util.UUID;
 
 /**
- * !!! DO NOT IMPLEMENT THIS INTERFACE !!!
+ * <b>!!! DO NOT IMPLEMENT THIS INTERFACE !!!</b>
  * <p>
- * Use provided static field {@link #INSTANCE} instead. That field gets populated to a valid instance during
- * pre-initialization.
+ * Use {@link ObjectHolder @ObjectHolder(IPartyManager.REGISTRY_KEY)} to get an instance instead.
  */
 public interface IPartyManager extends IApiInstance {
-    // TODO: Investigate if this dies at runtime when API is in separate .jar
-    @ObjectHolder("hcparty:partymanager")
-    IPartyManager INSTANCE = null;
+    String REGISTRY_KEY = "hcparty:partymanager";
+    @ObjectHolder(REGISTRY_KEY) IPartyManager INSTANCE = null; // TODO: Investigate if this dies at runtime when API is in separate .jar
 
-    /**
-     * Gets the invite manager
-     */
-    IInviteManager getInviteManager();
 
     /**
      * Returns true if the player is in a party
@@ -28,24 +22,19 @@ public interface IPartyManager extends IApiInstance {
     boolean isInParty(UUID playerUuid);
 
     /**
-     * Creates a new party and assigns the given player as its leader.
-     * Throws IllegalStateException if player is already in a party.
+     * Creates a new party and assigns the given player as its leader. Throws IllegalStateException if player already
+     * belongs to a party.
      */
-    void createParty(UUID leaderUuid);
+    IParty createParty(UUID leaderUuid);
 
     /**
      * Gets the party player currently belongs to. null if player is not in a party
      */
     @Nullable
-    IParty getCurrentParty(UUID playerUuid);
+    IParty getParty(UUID playerUuid);
 
     /**
-     * Adds a player to the party. Note: Does not remove invites/requests
+     * Resets the party manager. Removes all parties and forgets invites/requests
      */
-    void addPlayerToParty(UUID playerUuid, IParty party, boolean isLeader);
-
-    /**
-     * Removes target player from party it currently belongs to
-     */
-    void removePlayerFromParty(UUID playerUuid);
+    void reset();
 }

@@ -1,19 +1,53 @@
 package jakojaannos.hcparty.api;
 
+import com.google.common.collect.ImmutableList;
+
 import java.util.List;
 import java.util.UUID;
 
 public interface IParty {
 
-    List<UUID> getMembers();
+    /**
+     * Gets the party ID
+     */
+    byte getId();
 
-    List<UUID> getLeaders();
+    /**
+     * Gets an immutable list of all party members
+     */
+    ImmutableList<UUID> getMembers();
 
-    boolean isMember(UUID playerUuid);
+    /**
+     * Gets the party leader
+     */
+    UUID getLeader();
 
-    boolean isLeader(UUID playerUuid);
+    /**
+     * Sets the party leader
+     */
+    void setLeader(UUID playerUuid);
 
-    void addMember(UUID playerUuid, boolean isLeader);
+    /**
+     * Adds a player to the party
+     */
+    void addMember(UUID playerUuid);
 
+    /**
+     * Removes a player from the party
+     */
     void removeMember(UUID playerUuid);
+
+    /**
+     * Checks if given player is a member of this party
+     */
+    default boolean isMember(UUID playerUuid) {
+        return getMembers().contains(playerUuid);
+    }
+
+    /**
+     * Checks if given player is the leader of this party
+     */
+    default boolean isLeader(UUID playerUuid) {
+        return getLeader().equals(playerUuid);
+    }
 }

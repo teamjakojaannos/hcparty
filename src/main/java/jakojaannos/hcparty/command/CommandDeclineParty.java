@@ -1,6 +1,7 @@
 package jakojaannos.hcparty.command;
 
 import com.google.common.base.Preconditions;
+import jakojaannos.hcparty.api.IInviteManager;
 import jakojaannos.hcparty.api.IParty;
 import jakojaannos.hcparty.api.IPartyManager;
 import net.minecraft.command.CommandException;
@@ -23,16 +24,16 @@ public class CommandDeclineParty extends CommandPartyBase {
     }
 
     @Override
-    protected void execute(MinecraftServer server, ICommandSender sender, String[] args, IPartyManager manager, UUID playerUuid) throws CommandException {
+    protected void execute(MinecraftServer server, ICommandSender sender, String[] args, IPartyManager manager, IInviteManager inviteManager, UUID playerUuid) throws CommandException {
         // Parse index from arguments
         int index = 0;
         if (args.length > 0) {
             index = parseInt(args[0], 0);
         }
 
-        // In a party, accepting requests
+        // In a party, rejecting requests
         if (manager.isInParty(playerUuid)) {
-            final IParty party = manager.getCurrentParty(playerUuid);
+            final IParty party = manager.getParty(playerUuid);
             Preconditions.checkNotNull(party);
 
             // Only party leader can decline requests
@@ -41,19 +42,19 @@ public class CommandDeclineParty extends CommandPartyBase {
                 throw new CommandException("commands.hcparty.error.notleader");
             }
 
-            List<UUID> requests = manager.getInviteManager().getPendingRequests(party);
+            List<UUID> requests = inviteManager.getPendingRequests(party);
             if (index < requests.size()) {
-                manager.getInviteManager().removeRequest(party, index);
+                inviteManager.rejectProposal(requests.get(index), party);
                 sender.sendMessage(new TextComponentTranslation("commands.hcparty.decline.successrequest"));
             } else {
                 throw new CommandException("commands.hcparty.error.invalidid");
             }
         }
-        // Not in a party, accepting invites
+        // Not in a party, rejecting invites
         else {
-            List<IParty> invites = manager.getInviteManager().getPendingInvites(playerUuid);
+            List<IParty> invites = inviteManager.getPendingInvites(playerUuid);
             if (index < invites.size()) {
-                manager.getInviteManager().removeInvite(playerUuid, index);
+                inviteManager.rejectProposal(playerUuid, invites.get(index));
                 sender.sendMessage(new TextComponentTranslation("commands.hcparty.decline.successinvite"));
             } else {
                 throw new CommandException("commands.hcparty.error.invalidid");

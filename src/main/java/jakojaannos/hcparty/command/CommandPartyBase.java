@@ -1,6 +1,7 @@
 package jakojaannos.hcparty.command;
 
 import com.google.common.base.Preconditions;
+import jakojaannos.hcparty.api.IInviteManager;
 import jakojaannos.hcparty.api.IPartyManager;
 import net.minecraft.command.*;
 import net.minecraft.entity.Entity;
@@ -20,10 +21,11 @@ public abstract class CommandPartyBase extends CommandBase {
         final EntityPlayer senderPlayer = (EntityPlayer) senderEntity;
 
         Preconditions.checkNotNull(IPartyManager.INSTANCE);
-        execute(server, sender, args, IPartyManager.INSTANCE, getUUID(senderPlayer));
+        Preconditions.checkNotNull(IInviteManager.INSTANCE);
+        execute(server, sender, args, IPartyManager.INSTANCE, IInviteManager.INSTANCE, getUUID(senderPlayer));
     }
 
-    protected abstract void execute(MinecraftServer server, ICommandSender sender, String[] args, IPartyManager manager, UUID playerUuid) throws CommandException;
+    protected abstract void execute(MinecraftServer server, ICommandSender sender, String[] args, IPartyManager manager, IInviteManager inviteManager, UUID playerUuid) throws CommandException;
 
     UUID findUUIDByName(MinecraftServer server, String name) throws CommandException {
         EntityPlayer target = server.getPlayerList().getPlayerByUsername(name);
