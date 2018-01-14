@@ -1,37 +1,7 @@
-commands.hcparty.usage=/hcparty <join|leave|create|list|invite|accept|decline>
-commands.hcparty.error.notplayer=Only players can use this command!
-commands.hcparty.error.playernotfound=No such player!
-commands.hcparty.error.inparty=Already in a party! Leave your old party first using /hcparty leave
-commands.hcparty.error.notinparty=Not in a party!
-commands.hcparty.error.notleader=Not party leader!
-commands.hcparty.error.invalidid=Invalid requestId!
+attribute.name.life.bleedoutResist=Bleedout Resistance
+attribute.name.life.bleedoutMaxHealth=Max Bleedout Health
+attribute.name.life.bleedoutCounterMax=Max Bleedout Count
 
-commands.hcparty.join.usage=Use /hcparty join <player> to join player's party.
-commands.hcparty.join.error.notinparty=Target player is not in party!
-commands.hcparty.join.success=Request to join the party sent! Please wait until party leader accepts your request.
-
-commands.hcparty.invite.usage=Use /hcparty invite <player> to invite a player to your party.
-commands.hcparty.invite.success=Invite sent!
-
-commands.hcparty.leave.usage=Use /hcparty leave to leave current party
-commands.hcparty.leave.success=You left the party
-
-commands.hcparty.create.usage=Use /hcparty create to create a new party.
-commands.hcparty.create.success=Created a party, you are now party leader. Use /hcparty invite to invite other players to your party
-
-commands.hcparty.list.usage=Use /hcparty list to get list of current party members and join requests or party invites
-commands.hcparty.list.text.party=Party members:
-commands.hcparty.list.text.notinparty=Not in party
-commands.hcparty.list.text.invited=Invited players:
-commands.hcparty.list.text.requests=Requests to join:
-commands.hcparty.list.text.invites=Pending invites:
-
-commands.hcparty.accept.usage=Use /hcparty accept [requestId] to accept request with given id.
-commands.hcparty.accept.error.empty=Nothing to accept!
-commands.hcparty.accept.successrequest=Request accepted, player joins the party!
-commands.hcparty.accept.successinvite=Invite accepted, you join the party!
-
-commands.hcparty.decline.usage=Use /hcparty decline [requestId] to decline request with given id.
-commands.hcparty.decline.error.empty=Nothing to decline!
-commands.hcparty.decline.successrequest=Request declined
-commands.hcparty.decline.successinvite=Invite declined
+downed.generic=%1$s is bleeding out!
+unconscious.generic=%1$s is now unconscious!
+death.attack.life_bleedout=%1$s died

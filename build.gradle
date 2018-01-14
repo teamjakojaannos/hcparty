@@ -17,8 +17,8 @@ ext.junitJupiterVersion  = '5.0.2'
 
 
 version = "0.0.0"
-group = "jakojaannos.hcparty"
-archivesBaseName = "hcparty"
+group = "jakojaannos.life"
+archivesBaseName = "life"
 
 sourceCompatibility = targetCompatibility = '1.8'
 compileJava {
@@ -43,6 +43,10 @@ minecraft {
 
     // Replace info in ModInfo.java
     replace '__VERSION__', project.version
+
+    // Replace API versions
+    replace '__VERSION_API_REVIVAL__', '0.0.0'
+    replace '__VERSION_API_RESURRECT__', '0.0.0'
 }
 
 dependencies {

@@ -1,12 +1,10 @@
 [
 {
-  "modid": "hcparty",
-  "name": "Hardcore Party",
-  "description": "'cos losing is much more fun with friends!",
+  "modid": "life",
+  "name": "Losing Is Fun, eh?",
+  "description": "Making losing (more) fun again!",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "authorList": ["Team Jakojäännös"],
-  "requiredMods": ["jakojaannos-lib"],
-  "dependencies": ["jakojaannos-lib"]
+  "authorList": ["Team Jakojäännös"]
 }
 ]
