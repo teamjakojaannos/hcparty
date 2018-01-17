@@ -1,8 +1,14 @@
 package jakojaannos.life.init;
 
-import jakojaannos.life.api.revival.IRevivable;
-import jakojaannos.life.revival.capability.RevivableProvider;
-import jakojaannos.life.revival.capability.RevivableStorage;
+import jakojaannos.life.api.revival.capabilities.IBleedoutHandler;
+import jakojaannos.life.api.revival.capabilities.IRevivable;
+import jakojaannos.life.api.revival.capabilities.ISavior;
+import jakojaannos.life.api.revival.capabilities.IUnconsciousHandler;
+import jakojaannos.life.revival.capability.PlayerCapabilityProvider;
+import jakojaannos.life.revival.capability.storage.BleedoutStorage;
+import jakojaannos.life.revival.capability.storage.RevivableStorage;
+import jakojaannos.life.revival.capability.storage.SaviorStorage;
+import jakojaannos.life.revival.capability.storage.UnconsciousStorage;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
@@ -18,20 +24,33 @@ public final class ModCapabilities {
     @CapabilityInject(IRevivable.class)
     public static final Capability<IRevivable> REVIVABLE = null;
 
+    @CapabilityInject(ISavior.class)
+    public static final Capability<ISavior> SAVIOR = null;
+
+    @CapabilityInject(IBleedoutHandler.class)
+    public static final Capability<IBleedoutHandler> BLEEDOUT_HANDLER = null;
+
+    @CapabilityInject(IUnconsciousHandler.class)
+    public static final Capability<IUnconsciousHandler> UNCONSCIOUS_HANDLER = null;
+
+
     public static void initCapabilities() {
-        CapabilityManager.INSTANCE.register(
-                IRevivable.class,
-                new RevivableStorage(),
-                () -> {
-                    throw new IllegalStateException("Default instance factory not supported!");
-                });
+        CapabilityManager.INSTANCE.register(IRevivable.class, new RevivableStorage(), () -> null);
+        CapabilityManager.INSTANCE.register(ISavior.class, new SaviorStorage(), () -> null);
+        CapabilityManager.INSTANCE.register(IBleedoutHandler.class, new BleedoutStorage(), () -> null);
+        CapabilityManager.INSTANCE.register(IUnconsciousHandler.class, new UnconsciousStorage(), () -> null);
     }
 
     @SubscribeEvent
     public static void onCapabilityInject(AttachCapabilitiesEvent<Entity> event) {
         if (event.getObject() instanceof EntityPlayer) {
             EntityPlayer player = (EntityPlayer) event.getObject();
-            event.addCapability(new ResourceLocation(IRevivable.REGISTRY_NAME), new RevivableProvider(player));
+            PlayerCapabilityProvider provider = new PlayerCapabilityProvider(player);
+            event.addCapability(new ResourceLocation(IRevivable.REGISTRY_KEY), provider);
+            event.addCapability(new ResourceLocation(ISavior.REGISTRY_KEY), provider);
+            event.addCapability(new ResourceLocation(IBleedoutHandler.REGISTRY_KEY), provider);
+            event.addCapability(new ResourceLocation(IUnconsciousHandler.REGISTRY_KEY), provider);
         }
     }
+
 }

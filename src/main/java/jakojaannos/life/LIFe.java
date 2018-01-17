@@ -1,6 +1,8 @@
 package jakojaannos.life;
 
+import jakojaannos.life.init.ModCapabilities;
 import jakojaannos.life.init.ModCommands;
+import jakojaannos.life.network.ModNetworkManager;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -19,6 +21,11 @@ public class LIFe {
     @Instance(ModInfo.MODID)
     public static LIFe instance;
 
+    private final ModNetworkManager netmanInstance = new ModNetworkManager(ModInfo.MODID);
+    public static ModNetworkManager getNetman() {
+        return instance.netmanInstance;
+    }
+
     @EventHandler
     public void onServerStarting(FMLServerStartingEvent event) {
         ModCommands.initCommands(event);
@@ -26,7 +33,7 @@ public class LIFe {
 
     @EventHandler
     public void onInit(FMLPreInitializationEvent event) {
-
+        ModCapabilities.initCapabilities();
     }
 
     @EventHandler
@@ -34,7 +41,7 @@ public class LIFe {
 
     }
 
-    @Mod.EventHandler
+    @EventHandler
     public void onInit(FMLPostInitializationEvent event) {
 
     }
