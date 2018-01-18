@@ -1,8 +1,7 @@
 package jakojaannos.life.api.revival.event;
 
-import jakojaannos.life.api.revival.capabilities.IBleedoutHandler;
+import jakojaannos.life.api.revival.capability.IBleedoutHandler;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.common.eventhandler.Event;
 
 public abstract class BleedoutEvent extends Event {

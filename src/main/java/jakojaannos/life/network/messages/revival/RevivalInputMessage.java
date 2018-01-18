@@ -1,7 +1,7 @@
 package jakojaannos.life.network.messages.revival;
 
 import io.netty.buffer.ByteBuf;
-import jakojaannos.life.api.revival.capabilities.ISavior;
+import jakojaannos.life.api.revival.capability.ISavior;
 import jakojaannos.life.init.ModCapabilities;
 import jakojaannos.life.network.messages.ServerMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;

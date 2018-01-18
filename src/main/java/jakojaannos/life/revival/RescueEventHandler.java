@@ -2,8 +2,8 @@ package jakojaannos.life.revival;
 
 import com.google.common.base.Preconditions;
 import jakojaannos.life.LIFe;
-import jakojaannos.life.api.revival.capabilities.IRevivable;
-import jakojaannos.life.api.revival.capabilities.ISavior;
+import jakojaannos.life.api.revival.capability.IRevivable;
+import jakojaannos.life.api.revival.capability.ISavior;
 import jakojaannos.life.api.revival.event.RevivableEvent;
 import jakojaannos.life.config.ModConfig;
 import jakojaannos.life.init.ModCapabilities;
@@ -83,7 +83,7 @@ public class RescueEventHandler {
         Optional<EntityPlayer> target = player.world.getPlayers(EntityPlayer.class, p -> p != null && p != player && p.dimension == player.dimension)
                 .stream()
                 .filter(RescueEventHandler::isDeadAndRevivable)
-                .filter(e -> player.getDistanceSq(e) < ModConfig.revival.revival.maxRevivalRange * ModConfig.revival.revival.maxRevivalRange)
+                .filter(e -> result.hitVec.squareDistanceTo(e.getPositionVector()) < ModConfig.revival.revival.revivalAimRadius * ModConfig.revival.revival.revivalAimRadius)
                 .sorted(Comparator.comparingDouble(player::getDistanceSq))
                 .findFirst();
 

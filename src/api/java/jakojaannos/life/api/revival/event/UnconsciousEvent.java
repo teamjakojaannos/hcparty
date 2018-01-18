@@ -1,6 +1,6 @@
 package jakojaannos.life.api.revival.event;
 
-import jakojaannos.life.api.revival.capabilities.IUnconsciousHandler;
+import jakojaannos.life.api.revival.capability.IUnconsciousHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.eventhandler.Event;
 

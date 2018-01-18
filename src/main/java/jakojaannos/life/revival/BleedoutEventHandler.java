@@ -1,8 +1,9 @@
 package jakojaannos.life.revival;
 
 import jakojaannos.life.LIFe;
-import jakojaannos.life.api.revival.capabilities.IBleedoutHandler;
-import jakojaannos.life.api.revival.capabilities.IUnconsciousHandler;
+import jakojaannos.life.api.revival.capability.IBleedoutHandler;
+import jakojaannos.life.api.revival.capability.IRevivable;
+import jakojaannos.life.api.revival.capability.IUnconsciousHandler;
 import jakojaannos.life.api.revival.event.BleedoutEvent;
 import jakojaannos.life.api.revival.event.UnconsciousEvent;
 import jakojaannos.life.config.ModConfig;
@@ -92,8 +93,15 @@ public class BleedoutEventHandler {
             bleedoutHandler.tickTimer();
             int timer = bleedoutHandler.getBleedoutTime();
 
+            // Prevent applying damage if the config flag is set
+            boolean canHurt = true;
+            IRevivable revivable = player.getCapability(ModCapabilities.REVIVABLE, null);
+            if (revivable != null && ModConfig.revival.revival.revivingPreventsBleedoutDamage) {
+                canHurt = !revivable.isBeingRevived();
+            }
+
             // Do damage instances at configured interval
-            if (timer % ModConfig.revival.bleedout.damageInterval == 0) {
+            if (timer % ModConfig.revival.bleedout.damageInterval == 0 && canHurt) {
                 float damage = ModConfig.revival.bleedout.damagePerInstance;
                 float resistance = bleedoutHandler.getBleedoutResistance();
                 BleedoutEvent.Damage damageEvent = new BleedoutEvent.Damage(player, bleedoutHandler, damage, resistance);
@@ -130,9 +138,17 @@ public class BleedoutEventHandler {
     private static void unconsciousTick(EntityPlayer player) {
         IUnconsciousHandler unconsciousHandler = player.getCapability(ModCapabilities.UNCONSCIOUS_HANDLER, null);
         if (unconsciousHandler != null) {
-            unconsciousHandler.tickTimer();
+            boolean skipTick = false;
+            IRevivable revivable = player.getCapability(ModCapabilities.REVIVABLE, null);
+            if (revivable != null && ModConfig.revival.revival.revivingPausesUnconsciousTimer) {
+                skipTick = !revivable.isBeingRevived();
+            }
 
-            if (unconsciousHandler.getUnconsciousTimer() > unconsciousHandler.getUnconsciousDuration()) {
+            if (!skipTick) {
+                unconsciousHandler.tickTimer();
+            }
+
+            if (unconsciousHandler.getTimer() > unconsciousHandler.getDuration()) {
                 player.setDead();
                 MinecraftForge.EVENT_BUS.post(new UnconsciousEvent.Died(player, unconsciousHandler));
                 LIFe.getNetman().sendToDimension(new DieMessage(player.getEntityId()), player.dimension);

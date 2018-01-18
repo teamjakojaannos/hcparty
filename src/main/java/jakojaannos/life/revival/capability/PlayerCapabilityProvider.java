@@ -1,15 +1,14 @@
 package jakojaannos.life.revival.capability;
 
-import jakojaannos.life.api.revival.capabilities.IBleedoutHandler;
-import jakojaannos.life.api.revival.capabilities.IRevivable;
-import jakojaannos.life.api.revival.capabilities.ISavior;
-import jakojaannos.life.api.revival.capabilities.IUnconsciousHandler;
+import jakojaannos.life.api.revival.capability.IBleedoutHandler;
+import jakojaannos.life.api.revival.capability.IRevivable;
+import jakojaannos.life.api.revival.capability.ISavior;
+import jakojaannos.life.api.revival.capability.IUnconsciousHandler;
 import jakojaannos.life.init.ModCapabilities;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 
 import javax.annotation.Nonnull;
@@ -28,7 +27,7 @@ public class PlayerCapabilityProvider implements ICapabilitySerializable<NBTTagC
         revivable = new PlayerRevivable(player);
         savior = new PlayerSavior(player);
         bleedoutHandler = new PlayerBleedoutHandler(player);
-        unconsciousHandler = new PlayerUnconsciousHandler(player);
+        unconsciousHandler = new PlayerUnconsciousHandler();
     }
 
     @Override

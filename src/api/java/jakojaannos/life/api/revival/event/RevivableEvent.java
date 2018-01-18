@@ -1,7 +1,7 @@
 package jakojaannos.life.api.revival.event;
 
-import jakojaannos.life.api.revival.capabilities.IRevivable;
-import jakojaannos.life.api.revival.capabilities.ISavior;
+import jakojaannos.life.api.revival.capability.IRevivable;
+import jakojaannos.life.api.revival.capability.ISavior;
 import net.minecraftforge.fml.common.eventhandler.Event;
 
 public abstract class RevivableEvent extends Event {

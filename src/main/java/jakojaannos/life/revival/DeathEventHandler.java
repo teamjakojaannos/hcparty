@@ -1,8 +1,8 @@
 package jakojaannos.life.revival;
 
 import jakojaannos.life.LIFe;
-import jakojaannos.life.api.revival.capabilities.IBleedoutHandler;
-import jakojaannos.life.api.revival.capabilities.IUnconsciousHandler;
+import jakojaannos.life.api.revival.capability.IBleedoutHandler;
+import jakojaannos.life.api.revival.capability.IUnconsciousHandler;
 import jakojaannos.life.api.revival.event.BleedoutEvent;
 import jakojaannos.life.config.ModConfig;
 import jakojaannos.life.init.ModCapabilities;
@@ -41,13 +41,19 @@ public class DeathEventHandler {
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
         if (event.phase == TickEvent.Phase.START && event.player.getHealth() <= 0) {
+            // 19th tick is the last tick, by incrementing the value to 20 vanilla will set the value to 21 which makes
+            // the removal condition (deathTime == 20) return false, preventing the removal of the entity.
             if (event.player.deathTime == 19) {
-                event.player.deathTime = 21; // It's never 20 if it's greater than 20
+                event.player.deathTime = 20; // It's never 20 if it's greater than 20
             }
         }
 
         // Fix the deathTime after the tick
         if (event.phase == TickEvent.Phase.END && event.player.getHealth() <= 0) {
+            // Skipping the 19th tick works great for preventing removal, but messes up the rendering (which uses
+            // deathTime to calculate rotation for the death 'animation'). To fix that, clamp the value to 20 during
+            // post-tick so that rendering will use value of 20, while vanilla will again increment the value to 21
+            // during next tick, preventing entity removal.
             if (event.player.deathTime > 20) {
                 event.player.deathTime = 20;
             }
@@ -80,7 +86,7 @@ public class DeathEventHandler {
             // If bleedout counter is capped out, die instantly instead of going down
             if (bleedoutCount > bleedoutHandler.getBleedoutCounterMax()) {
                 bleedoutHandler.setBleedoutHealth(0);
-                unconsciousHandler.setTimer(unconsciousHandler.getUnconsciousDuration());
+                unconsciousHandler.setTimer(unconsciousHandler.getDuration());
             }
             // Enter bleedout
             else {

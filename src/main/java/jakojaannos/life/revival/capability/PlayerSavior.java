@@ -1,7 +1,8 @@
 package jakojaannos.life.revival.capability;
 
-import jakojaannos.life.api.revival.capabilities.IRevivable;
-import jakojaannos.life.api.revival.capabilities.ISavior;
+import jakojaannos.life.api.entity.LIFePlayerAttributes;
+import jakojaannos.life.api.revival.capability.IRevivable;
+import jakojaannos.life.api.revival.capability.ISavior;
 import net.minecraft.entity.player.EntityPlayer;
 
 import javax.annotation.Nullable;
@@ -33,7 +34,7 @@ public class PlayerSavior implements ISavior {
 
     @Override
     public float getRevivalSpeed() {
-        return 1;
+        return (float)player.getEntityAttribute(LIFePlayerAttributes.REVIVAL_SPEED).getAttributeValue();
     }
 
     @Nullable

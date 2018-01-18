@@ -1,7 +1,6 @@
-package jakojaannos.life.api.revival.capabilities;
+package jakojaannos.life.api.revival.capability;
 
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.MathHelper;
 
 /**
  * Capability for entities that do not die instantly when their health reaches zero, but rather enter a special

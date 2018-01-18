@@ -1,9 +1,12 @@
 package jakojaannos.life.init;
 
-import jakojaannos.life.api.revival.capabilities.IBleedoutHandler;
-import jakojaannos.life.api.revival.capabilities.IRevivable;
-import jakojaannos.life.api.revival.capabilities.ISavior;
-import jakojaannos.life.api.revival.capabilities.IUnconsciousHandler;
+import jakojaannos.life.api.entity.capability.IHealthTracker;
+import jakojaannos.life.api.revival.capability.IBleedoutHandler;
+import jakojaannos.life.api.revival.capability.IRevivable;
+import jakojaannos.life.api.revival.capability.ISavior;
+import jakojaannos.life.api.revival.capability.IUnconsciousHandler;
+import jakojaannos.life.entity.capability.HealthTrackerProvider;
+import jakojaannos.life.entity.capability.HealthTrackerStorage;
 import jakojaannos.life.revival.capability.PlayerCapabilityProvider;
 import jakojaannos.life.revival.capability.storage.BleedoutStorage;
 import jakojaannos.life.revival.capability.storage.RevivableStorage;
@@ -34,11 +37,17 @@ public final class ModCapabilities {
     public static final Capability<IUnconsciousHandler> UNCONSCIOUS_HANDLER = null;
 
 
+    @CapabilityInject(IHealthTracker.class)
+    public static final Capability<IHealthTracker> HEALTH_TRACKER = null;
+
+
     public static void initCapabilities() {
         CapabilityManager.INSTANCE.register(IRevivable.class, new RevivableStorage(), () -> null);
         CapabilityManager.INSTANCE.register(ISavior.class, new SaviorStorage(), () -> null);
         CapabilityManager.INSTANCE.register(IBleedoutHandler.class, new BleedoutStorage(), () -> null);
         CapabilityManager.INSTANCE.register(IUnconsciousHandler.class, new UnconsciousStorage(), () -> null);
+
+        CapabilityManager.INSTANCE.register(IHealthTracker.class, new HealthTrackerStorage(), () -> null);
     }
 
     @SubscribeEvent
@@ -50,6 +59,8 @@ public final class ModCapabilities {
             event.addCapability(new ResourceLocation(ISavior.REGISTRY_KEY), provider);
             event.addCapability(new ResourceLocation(IBleedoutHandler.REGISTRY_KEY), provider);
             event.addCapability(new ResourceLocation(IUnconsciousHandler.REGISTRY_KEY), provider);
+
+            event.addCapability(new ResourceLocation(IHealthTracker.REGISTRY_KEY), new HealthTrackerProvider());
         }
     }
 

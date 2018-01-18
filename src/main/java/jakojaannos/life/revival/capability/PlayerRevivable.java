@@ -2,9 +2,10 @@ package jakojaannos.life.revival.capability;
 
 import jakojaannos.life.ModInfo;
 import jakojaannos.life.api.entity.LIFePlayerAttributes;
-import jakojaannos.life.api.revival.capabilities.IBleedoutHandler;
-import jakojaannos.life.api.revival.capabilities.IRevivable;
-import jakojaannos.life.api.revival.capabilities.ISavior;
+import jakojaannos.life.api.entity.capability.IHealthTracker;
+import jakojaannos.life.api.revival.capability.IBleedoutHandler;
+import jakojaannos.life.api.revival.capability.IRevivable;
+import jakojaannos.life.api.revival.capability.ISavior;
 import jakojaannos.life.config.ModConfig;
 import jakojaannos.life.init.ModCapabilities;
 import net.minecraft.entity.player.EntityPlayer;
@@ -159,7 +160,22 @@ public class PlayerRevivable implements IRevivable {
 
     private static float calculateScaledMaxHealth(EntityPlayer player) {
         final float maxHealth = player.getMaxHealth();
-        final float recentMaxHealth = maxHealth; // TODO: Calculate this
+
+        float recentMaxHealth;
+        IHealthTracker tracker = player.getCapability(ModCapabilities.HEALTH_TRACKER, null);
+        // If tracker exists, calculate average of recent health values
+        if (tracker != null) {
+            float sum = 0.0f;
+            int nTicks = ModConfig.revival.spawningHealth.healthTrackingSamples;
+            for (int i = 0; i < nTicks; i++) {
+                sum += tracker.getHealth(i);
+            }
+            recentMaxHealth = sum / nTicks;
+        }
+        // If tracker could not be found, use player's maximum health
+        else {
+            recentMaxHealth = maxHealth;
+        }
 
         return recentMaxHealth + (maxHealth - recentMaxHealth) * ModConfig.revival.spawningHealth.recentHealthScalingFactor;
     }

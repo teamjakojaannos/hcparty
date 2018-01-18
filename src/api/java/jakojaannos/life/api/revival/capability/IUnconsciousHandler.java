@@ -1,4 +1,4 @@
-package jakojaannos.life.api.revival.capabilities;
+package jakojaannos.life.api.revival.capability;
 
 /**
  * Capability for entities that do not die when their bleedout health reaches zero, but rather fall unconscious for a
@@ -10,17 +10,14 @@ public interface IUnconsciousHandler {
     /**
      * Total time the entity may spend unconscious before dying (in ticks)
      */
-    int getUnconsciousDuration();
+    int getDuration();
+
+    void setDuration(int duration);
 
     /**
      * Time the entity has been unconscious
      */
-    int getUnconsciousTimer();
-
-    /**
-     * Increases timer value by one
-     */
-    void tickTimer();
+    int getTimer();
 
     /**
      * Resets the timer to given value
@@ -32,5 +29,12 @@ public interface IUnconsciousHandler {
      */
     default void resetTimer() {
         setTimer(0);
+    }
+
+    /**
+     * Increases timer value by one
+     */
+    default void tickTimer() {
+        setTimer(getTimer() + 1);
     }
 }

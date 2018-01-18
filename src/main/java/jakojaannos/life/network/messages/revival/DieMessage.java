@@ -1,7 +1,7 @@
 package jakojaannos.life.network.messages.revival;
 
 import io.netty.buffer.ByteBuf;
-import jakojaannos.life.api.revival.capabilities.IUnconsciousHandler;
+import jakojaannos.life.api.revival.capability.IUnconsciousHandler;
 import jakojaannos.life.api.revival.event.UnconsciousEvent;
 import jakojaannos.life.init.ModCapabilities;
 import jakojaannos.life.network.messages.ClientMessageHandler;

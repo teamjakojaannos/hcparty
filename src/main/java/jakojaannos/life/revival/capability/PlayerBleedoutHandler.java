@@ -1,8 +1,10 @@
 package jakojaannos.life.revival.capability;
 
 import jakojaannos.life.api.entity.LIFePlayerAttributes;
-import jakojaannos.life.api.revival.capabilities.IBleedoutHandler;
+import jakojaannos.life.api.revival.capability.IBleedoutHandler;
+import jakojaannos.life.config.ModConfig;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.math.MathHelper;
 
 public class PlayerBleedoutHandler implements IBleedoutHandler {
     private final EntityPlayer player;
@@ -35,7 +37,10 @@ public class PlayerBleedoutHandler implements IBleedoutHandler {
 
     @Override
     public float getMaxBleedoutHealth() {
-        return (float) player.getEntityAttribute(LIFePlayerAttributes.BLEEDOUT_MAX_HEALTH).getAttributeValue();
+        return MathHelper.clamp(
+                (float) player.getEntityAttribute(LIFePlayerAttributes.BLEEDOUT_MAX_HEALTH).getAttributeValue(),
+                ModConfig.revival.bleedout.minHealth,
+                ModConfig.revival.bleedout.maxHealth);
     }
 
     @Override

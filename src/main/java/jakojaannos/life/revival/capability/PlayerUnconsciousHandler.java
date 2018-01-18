@@ -1,38 +1,34 @@
 package jakojaannos.life.revival.capability;
 
-import jakojaannos.life.api.revival.capabilities.IUnconsciousHandler;
-import net.minecraft.entity.player.EntityPlayer;
+import jakojaannos.life.api.revival.capability.IUnconsciousHandler;
+import jakojaannos.life.config.ModConfig;
 
 public class PlayerUnconsciousHandler implements IUnconsciousHandler {
-    private final EntityPlayer player;
+    private int duration;
     private int timer;
 
-    public PlayerUnconsciousHandler(EntityPlayer player) {
-        this.player = player;
+    public PlayerUnconsciousHandler() {
+        this.timer = 0;
+        this.duration = ModConfig.revival.unconscious.duration;
     }
 
     @Override
-    public int getUnconsciousDuration() {
-        return 60 * 20; // 1 minute
+    public int getDuration() {
+        return duration;
     }
 
     @Override
-    public int getUnconsciousTimer() {
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
+
+    @Override
+    public int getTimer() {
         return timer;
     }
 
     @Override
     public void setTimer(int time) {
         this.timer = time;
-    }
-
-    @Override
-    public void tickTimer() {
-        timer++;
-    }
-
-    @Override
-    public void resetTimer() {
-        timer = 0;
     }
 }

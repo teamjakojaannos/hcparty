@@ -1,6 +1,6 @@
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-package jakojaannos.life.api.revival.capabilities;
+package jakojaannos.life.api.revival.capability;
 
 import mcp.MethodsReturnNonnullByDefault;
 

@@ -1,8 +1,8 @@
 package jakojaannos.life.network.messages.revival;
 
 import io.netty.buffer.ByteBuf;
-import jakojaannos.life.api.revival.capabilities.IRevivable;
-import jakojaannos.life.api.revival.capabilities.ISavior;
+import jakojaannos.life.api.revival.capability.IRevivable;
+import jakojaannos.life.api.revival.capability.ISavior;
 import jakojaannos.life.init.ModCapabilities;
 import jakojaannos.life.network.messages.ClientMessageHandler;
 import net.minecraft.entity.Entity;

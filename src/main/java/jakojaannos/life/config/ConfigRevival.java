@@ -1,7 +1,6 @@
 package jakojaannos.life.config;
 
-import net.minecraftforge.common.config.Config.Comment;
-import net.minecraftforge.common.config.Config.RangeDouble;
+import net.minecraftforge.common.config.Config.*;
 
 public class ConfigRevival {
 
@@ -26,8 +25,11 @@ public class ConfigRevival {
         public float revivalAimRadius = 1.0f;
 
 
-        @Comment("Base duration in ticks how long it takes to revive a player")
+        @Comment("Base duration in how long it takes to revive a player. Actual time may vary depending on player attribute values")
         public int baseRevivalDuration = 40;
+
+        @Comment("Default player revival speed attribute value")
+        public float defaultRevivalSpeed = 1.0f;
     }
 
 
@@ -67,16 +69,20 @@ public class ConfigRevival {
 
 
         @Comment("Default health player has when bleeding out")
-        public float health = 100.0f;
+        public float defaultMaxHealth = 100.0f;
 
-        @Comment("Maximum value player bleedout health can increased to by modifiers")
+        @Comment("Maximum value maximum bleedout health can increased to by modifiers")
         public float maxHealth = Float.MAX_VALUE;
 
-        @Comment("Maximum value player bleedout health can decreased to by modifiers")
+        @Comment("Maximum value maximum bleedout health can decreased to by modifiers")
         public float minHealth = 0.001f;
+
 
         @Comment("Default mob aggro mode for mobs that are added by mods that don't add special aggro handlers for LIFe")
         public MobAggroMode mobAggroMode = MobAggroMode.LowPriority;
+
+        @Comment("Number of times the player can be downed before instantly dying")
+        public int defaultBleedoutCounterMax = 3;
 
         public enum MobAggroMode {
             /**
@@ -129,6 +135,9 @@ public class ConfigRevival {
     public Unconscious unconscious = new Unconscious();
 
     public static class Unconscious {
+        @Comment("Time the player may spend unconscious before dying")
+        @RequiresWorldRestart
+        public int duration = 3 * 20 * 60; // 3 minutes
     }
 
 
@@ -176,7 +185,7 @@ public class ConfigRevival {
 
         @Comment("The default value for maximum health percentage attribute. (The default percentage of maximum health the player will get when revived)")
         @RangeDouble(min = 0.0, max = 1.0)
-        public float maxHealthPercentageDefault = 0.5f;
+        public float defaultMaxHealthPercentage = 0.5f;
 
         @Comment({
                 "Scaling factor between max health and recent max health when calculating spawning health. e.g the value of",
@@ -201,6 +210,24 @@ public class ConfigRevival {
         })
         @RangeDouble(min = 0.0, max = 1.0)
         public float unconsciousMultiplier = 0.75f;
+
+        @Comment({
+                "Maximum number of health tracking samples stored.",
+                "",
+                "Player health is sampled every nth tick and samples stored for recent max health calculation. Recent",
+                "max health is calculated as the average of these samples. Once there are more than maximum number of",
+                "samples stored, oldest are automatically discarded as new samples are generated. This penalizes spending",
+                "long periods of time on low health and effectively prevents healing by getting downed and instantly",
+                "revived."
+        })
+        public int healthTrackingSamples = 4 * 30; // 5 ticks between samples => 20/5 = 4 samples per second, 30 seconds of backlog
+
+        @Comment({
+                "Number of ticks between health tracking samples. Small values make tracking more accurate, but use",
+                "slightly more memory, while larger values make tracking react a bit slower to health changes."
+        })
+        @RangeInt(min = 1, max = 20)
+        public int healthTrackingInterval = 5;
     }
 
 

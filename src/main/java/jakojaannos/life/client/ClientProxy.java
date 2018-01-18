@@ -3,7 +3,7 @@ package jakojaannos.life.client;
 import com.google.common.base.Preconditions;
 import jakojaannos.life.CommonProxy;
 import jakojaannos.life.LIFe;
-import jakojaannos.life.api.revival.capabilities.ISavior;
+import jakojaannos.life.api.revival.capability.ISavior;
 import jakojaannos.life.init.ModCapabilities;
 import jakojaannos.life.network.messages.revival.RevivalInputMessage;
 import net.minecraft.client.Minecraft;

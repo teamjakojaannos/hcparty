@@ -1,6 +1,5 @@
-package jakojaannos.life.api.revival.capabilities;
+package jakojaannos.life.api.revival.capability;
 
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 
 import javax.annotation.Nullable;
