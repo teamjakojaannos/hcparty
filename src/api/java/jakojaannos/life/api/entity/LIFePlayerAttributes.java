@@ -16,9 +16,4 @@ public final class LIFePlayerAttributes {
     public static final IAttribute SPAWN_HEALTH_PERCENTAGE = new RangedAttribute(null, "life.spawnHealthPercentage", 0.0d, 0.0d, 1.0d);
 
     public static final IAttribute REVIVAL_SPEED = new RangedAttribute(null, "life.revivalSpeed", 1.0d, 0.0d, Double.MAX_VALUE);
-
-    public LIFePlayerAttributes() {
-        EntityPlayer player = null;
-        player.attackEntityFrom(null, Float.NaN);
-    }
 }
