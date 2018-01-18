@@ -1,7 +1,8 @@
 # Project
 .gradle
 .idea
-libs
-out
-run
+libs/
+out/
+run/
+build/
 *.iml
