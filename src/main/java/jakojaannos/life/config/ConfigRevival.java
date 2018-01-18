@@ -1,6 +1,9 @@
 package jakojaannos.life.config;
 
-import net.minecraftforge.common.config.Config.*;
+import net.minecraftforge.common.config.Config.Comment;
+import net.minecraftforge.common.config.Config.RangeDouble;
+import net.minecraftforge.common.config.Config.RangeInt;
+import net.minecraftforge.common.config.Config.RequiresWorldRestart;
 
 public class ConfigRevival {
 
@@ -67,7 +70,6 @@ public class ConfigRevival {
         public float maxBleedoutResistance = 0.95f;
 
 
-
         @Comment("Default health player has when bleeding out")
         public float defaultMaxHealth = 100.0f;
 
@@ -83,6 +85,18 @@ public class ConfigRevival {
 
         @Comment("Number of times the player can be downed before instantly dying")
         public int defaultBleedoutCounterMax = 3;
+
+
+        @Comment("Should the players be allowed to continue attacking other entities while bleeding out")
+        public boolean allowAttackingWhileBleedingOut = true;
+
+        @Comment({
+                "If attacking while bleeding out is allowed, sets the default entity attribute value for damage reduction",
+                "to attacks done while bleeding out. Note that this is percentage of damage dealt, applied after armor ",
+                "and absorption reductions are calculated"
+        })
+        @RangeDouble(min = 0.0, max = 1.0)
+        public float defaultDamageReduction = 0.75f;
 
         public enum MobAggroMode {
             /**

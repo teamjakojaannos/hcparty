@@ -1,6 +1,7 @@
 package jakojaannos.life.revival;
 
 import jakojaannos.life.LIFe;
+import jakojaannos.life.api.entity.LIFePlayerAttributes;
 import jakojaannos.life.api.revival.capability.IBleedoutHandler;
 import jakojaannos.life.api.revival.capability.IRevivable;
 import jakojaannos.life.api.revival.capability.IUnconsciousHandler;
@@ -10,7 +11,6 @@ import jakojaannos.life.config.ModConfig;
 import jakojaannos.life.init.ModCapabilities;
 import jakojaannos.life.network.messages.revival.DieMessage;
 import jakojaannos.life.network.messages.revival.FallUnconsciousMessage;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.MobEffects;
@@ -19,6 +19,8 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingDamageEvent;
+import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -35,43 +37,82 @@ public class BleedoutEventHandler {
      */
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onLivingAttack(LivingAttackEvent event) {
-        final EntityLivingBase entityLiving = event.getEntityLiving();
-        if (entityLiving.world.isRemote) {
+        if (event.getEntityLiving() instanceof EntityPlayerMP) {
+            redirectDamage((EntityPlayerMP) event.getEntityLiving(), event.getAmount(), event.getSource());
+        }
+    }
+
+    private static void redirectDamage(EntityPlayerMP player, float amount, DamageSource source) {
+        IBleedoutHandler bleedoutHandler = player.getCapability(ModCapabilities.BLEEDOUT_HANDLER, null);
+        if (bleedoutHandler == null) {
             return;
         }
 
-        if (entityLiving instanceof EntityPlayerMP) {
-            EntityPlayerMP player = (EntityPlayerMP) entityLiving;
-            IBleedoutHandler bleedoutHandler = player.getCapability(ModCapabilities.BLEEDOUT_HANDLER, null);
-            if (bleedoutHandler != null) {
-                final DamageSource source = event.getSource();
+        if (player.isEntityInvulnerable(source)) {
+            return;
+        } else if (source.isFireDamage() && player.isPotionActive(MobEffects.FIRE_RESISTANCE)) {
+            return;
+        }
 
-                if (player.isEntityInvulnerable(source)) {
-                    return;
-                } else if (source.isFireDamage() && player.isPotionActive(MobEffects.FIRE_RESISTANCE)) {
-                    return;
-                }
+        float damageAmount = amount;
+        damageAmount = ForgeHooks.onLivingHurt(player, source, damageAmount);
+        if (damageAmount <= 0) return;
 
-                float damageAmount = event.getAmount();
-                damageAmount = ForgeHooks.onLivingHurt(player, event.getSource(), damageAmount);
-                if (damageAmount <= 0) return;
+        damageAmount = applyBleedoutResistance(damageAmount, bleedoutHandler.getBleedoutResistance());
 
-                damageAmount = applyBleedoutResistance(damageAmount, bleedoutHandler.getBleedoutResistance());
+        damageAmount = ForgeHooks.onLivingDamage(player, source, damageAmount);
 
-                damageAmount = ForgeHooks.onLivingDamage(player, event.getSource(), damageAmount);
+        if (damageAmount > 0.0f) {
+            float health = bleedoutHandler.getBleedoutHealth();
+            player.getCombatTracker().trackDamage(source, health, damageAmount);
+            bleedoutHandler.setBleedoutHealth(health - damageAmount);
 
-                if (damageAmount > 0.0f) {
-                    float health = bleedoutHandler.getBleedoutHealth();
-                    player.getCombatTracker().trackDamage(event.getSource(), health, damageAmount);
-                    bleedoutHandler.setBleedoutHealth(health - event.getAmount());
-
-                    if (bleedoutHandler.getBleedoutHealth() <= 0.0f) {
-                        fallUnconscious(player);
-                    }
-                }
+            if (bleedoutHandler.getBleedoutHealth() <= 0.0f) {
+                fallUnconscious(player);
             }
         }
     }
+
+
+    /**
+     * Applies damage reduction to attacks done while bleeding out
+     */
+    @SubscribeEvent
+    public static void onLivingDamage(LivingDamageEvent event) {
+        if (event.getSource().getTrueSource() instanceof EntityPlayer) {
+            event.setAmount(applyBleedoutDamageReduction((EntityPlayer) event.getSource().getTrueSource(), event.getAmount()));
+        }
+    }
+
+    private static float applyBleedoutDamageReduction(EntityPlayer player, float amount) {
+        // Don't apply if the player is alive
+        if (player.getHealth() > 0.0f) {
+            return amount;
+        }
+
+        // Note: No need to clamp as reduction is always in range 0.0f...1.0f
+        final float reduction = (float) player.getEntityAttribute(LIFePlayerAttributes.BLEEDOUT_DAMAGE_REDUCTION).getAttributeValue();
+        return amount * (1.0f - reduction);
+    }
+
+
+    /**
+     * Prevents players from damaging other entities while unconscious/dead
+     */
+    @SubscribeEvent
+    public static void onAttackEntity(AttackEntityEvent event) {
+        if (event.getEntityLiving().getHealth() <= 0.0f) {
+            // Cancel the event if:
+            //  1. bleedout attacks are disabled in configs
+            //  2. bleedout handler cannot be found
+            //  3. player has no bleedout health remaining
+            IBleedoutHandler bleedoutHandler = event.getEntityPlayer().getCapability(ModCapabilities.BLEEDOUT_HANDLER, null);
+            if (!ModConfig.revival.bleedout.allowAttackingWhileBleedingOut || (bleedoutHandler == null || bleedoutHandler.getBleedoutHealth() <= 0.0f)) {
+                event.setCanceled(true);
+            }
+        }
+    }
+
 
     /**
      * Handles transition between bleedout, unconsciousness and death

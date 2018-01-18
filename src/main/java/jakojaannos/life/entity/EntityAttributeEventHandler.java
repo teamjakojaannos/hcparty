@@ -22,6 +22,7 @@ public class EntityAttributeEventHandler {
         player.getAttributeMap().registerAttribute(LIFePlayerAttributes.BLEEDOUT_MAX_HEALTH);
         player.getAttributeMap().registerAttribute(LIFePlayerAttributes.BLEEDOUT_COUNTER_MAX);
         player.getAttributeMap().registerAttribute(LIFePlayerAttributes.BLEEDOUT_RESISTANCE);
+        player.getAttributeMap().registerAttribute(LIFePlayerAttributes.BLEEDOUT_DAMAGE_REDUCTION);
 
         player.getAttributeMap().registerAttribute(LIFePlayerAttributes.SPAWN_HEALTH_PERCENTAGE);
 
@@ -32,6 +33,7 @@ public class EntityAttributeEventHandler {
         player.getEntityAttribute(LIFePlayerAttributes.BLEEDOUT_MAX_HEALTH).setBaseValue(ModConfig.revival.bleedout.defaultMaxHealth);
         player.getEntityAttribute(LIFePlayerAttributes.BLEEDOUT_COUNTER_MAX).setBaseValue(ModConfig.revival.bleedout.defaultBleedoutCounterMax);
         player.getEntityAttribute(LIFePlayerAttributes.BLEEDOUT_RESISTANCE).setBaseValue(ModConfig.revival.bleedout.defaultBleedoutResistance);
+        player.getEntityAttribute(LIFePlayerAttributes.BLEEDOUT_DAMAGE_REDUCTION).setBaseValue(ModConfig.revival.bleedout.defaultDamageReduction);
 
         player.getEntityAttribute(LIFePlayerAttributes.SPAWN_HEALTH_PERCENTAGE).setBaseValue(ModConfig.revival.spawningHealth.defaultMaxHealthPercentage);
 
