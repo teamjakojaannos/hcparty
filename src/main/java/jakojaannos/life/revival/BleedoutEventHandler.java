@@ -54,35 +54,31 @@ public class BleedoutEventHandler {
         }
 
         if (player.isEntityInvulnerable(source)) {
-            LOGGER.info("invulnerable");
             return;
         } else if (source.isFireDamage() && player.isPotionActive(MobEffects.FIRE_RESISTANCE)) {
-            LOGGER.info("immune to fire");
+            return;
+        } else if (source != IBleedoutHandler.DAMAGE_BLEEDOUT && player.hurtResistantTime > 0) {
             return;
         }
 
         float damageAmount = amount;
         damageAmount = ForgeHooks.onLivingHurt(player, source, damageAmount);
         if (damageAmount <= 0) {
-            LOGGER.info("damage amount < 0");
             return;
         }
 
         damageAmount = applyBleedoutResistance(damageAmount, bleedoutHandler.getBleedoutResistance());
-
         damageAmount = ForgeHooks.onLivingDamage(player, source, damageAmount);
 
         if (damageAmount > 0.0f) {
             float health = bleedoutHandler.getBleedoutHealth();
             player.getCombatTracker().trackDamage(source, health, damageAmount);
             bleedoutHandler.setBleedoutHealth(health - damageAmount);
+            player.hurtResistantTime = player.maxHurtResistantTime;
 
-            LOGGER.info("bleedoutHealth after damage: {}", bleedoutHandler.getBleedoutHealth());
             if (bleedoutHandler.getBleedoutHealth() <= 0.0f) {
                 fallUnconscious(player);
             }
-        } else {
-            LOGGER.info("damage amount after modifiers < 0");
         }
     }
 
@@ -114,18 +110,13 @@ public class BleedoutEventHandler {
      */
     @SubscribeEvent
     public static void onAttackEntity(AttackEntityEvent event) {
-        LOGGER.info("onAttackEntity");
-
         if (event.getEntityLiving().getHealth() <= 0.0f) {
-            LOGGER.info("onAttackEntity -- health < 0");
-
             // Cancel the event if:
             //  1. bleedout attacks are disabled in configs
             //  2. bleedout handler cannot be found
             //  3. player has no bleedout health remaining
             IBleedoutHandler bleedoutHandler = event.getEntityPlayer().getCapability(ModCapabilities.BLEEDOUT_HANDLER, null);
             if (!ModConfig.revival.bleedout.allowAttackingWhileBleedingOut || (bleedoutHandler == null || bleedoutHandler.getBleedoutHealth() <= 0.0f)) {
-                LOGGER.info("onAttackEntity -- -- cancelling!");
                 event.setCanceled(true);
             }
         }
@@ -161,7 +152,6 @@ public class BleedoutEventHandler {
 
             // Do damage instances at configured interval
             if (timer % ModConfig.revival.bleedout.damageInterval == 0 && canHurt) {
-                LOGGER.info("doing damage instance");
                 float damage = ModConfig.revival.bleedout.damagePerInstance;
                 float resistance = bleedoutHandler.getBleedoutResistance();
                 BleedoutEvent.Damage damageEvent = new BleedoutEvent.Damage(player, bleedoutHandler, damage, resistance);
@@ -170,8 +160,6 @@ public class BleedoutEventHandler {
                 if (damageEvent.getDamage() > 0.0f) {
                     damage = applyBleedoutResistance(damageEvent.getDamage(), damageEvent.getResistance());
                     player.attackEntityFrom(IBleedoutHandler.DAMAGE_BLEEDOUT, damage);
-                } else {
-                    LOGGER.info("damage instance < 0");
                 }
             }
 
@@ -183,7 +171,7 @@ public class BleedoutEventHandler {
     }
 
     private static void fallUnconscious(EntityPlayer player) {
-        LOGGER.info("Falling unconscious!");
+        LOGGER.info("{} is falling unconscious!", player.getDisplayNameString());
 
         IUnconsciousHandler unconsciousHandler = player.getCapability(ModCapabilities.UNCONSCIOUS_HANDLER, null);
         if (unconsciousHandler != null) {
@@ -213,7 +201,7 @@ public class BleedoutEventHandler {
             }
 
             if (unconsciousHandler.getTimer() > unconsciousHandler.getDuration()) {
-                LOGGER.info("dying!");
+                LOGGER.info("{} is dying after being unconscious for too long!", player.getDisplayNameString());
                 player.setDead();
                 MinecraftForge.EVENT_BUS.post(new UnconsciousEvent.Died(player, unconsciousHandler));
                 LIFe.getNetman().sendToDimension(new DieMessage(player.getEntityId()), player.dimension);
