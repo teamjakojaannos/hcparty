@@ -1,9 +1,13 @@
 package jakojaannos.life.revival.capability;
 
+import jakojaannos.life.LIFe;
 import jakojaannos.life.api.entity.LIFePlayerAttributes;
 import jakojaannos.life.api.revival.capability.IBleedoutHandler;
 import jakojaannos.life.config.ModConfig;
+import jakojaannos.life.network.messages.revival.BleedoutHealthMessage;
+import jakojaannos.life.network.messages.revival.BleedoutTimeMessage;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.MathHelper;
 
 public class PlayerBleedoutHandler implements IBleedoutHandler {
@@ -51,6 +55,10 @@ public class PlayerBleedoutHandler implements IBleedoutHandler {
     @Override
     public void setBleedoutHealth(float health) {
         this.health = health;
+
+        if (!player.world.isRemote) {
+            LIFe.getNetman().sendTo(new BleedoutHealthMessage(health), (EntityPlayerMP) player);
+        }
     }
 
     @Override
@@ -66,5 +74,8 @@ public class PlayerBleedoutHandler implements IBleedoutHandler {
     @Override
     public void setBleedoutTime(int time) {
         this.timer = time;
+        if (!player.world.isRemote) {
+            LIFe.getNetman().sendTo(new BleedoutTimeMessage(this.timer), (EntityPlayerMP) player);
+        }
     }
 }

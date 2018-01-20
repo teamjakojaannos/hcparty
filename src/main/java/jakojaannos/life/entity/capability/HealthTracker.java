@@ -13,7 +13,7 @@ class HealthTracker implements IHealthTracker {
     HealthTracker() {
         backlogLength = ModConfig.revival.spawningHealth.healthTrackingSamples;
 
-        values = new float[1];
+        values = new float[backlogLength];
     }
 
     @Override
@@ -30,7 +30,7 @@ class HealthTracker implements IHealthTracker {
         backlogLength = ticks;
 
         float[] newValues = new float[ticks];
-        System.arraycopy(values, 0, newValues, 0, newValues.length);
+        System.arraycopy(values, 0, newValues, 0, Math.min(values.length, newValues.length));
         values = newValues;
     }
 

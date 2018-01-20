@@ -34,17 +34,17 @@ public class ClientProxy extends CommonProxy {
         }
 
         EntityPlayer player = Minecraft.getMinecraft().player;
-        if (player.getHealth() <= 0.0f) {
-
-        } else {
-            ISavior savior = player.getCapability(ModCapabilities.SAVIOR, null);
-            boolean tryingToInteract = Minecraft.getMinecraft().gameSettings.keyBindUseItem.isKeyDown();
-            if (savior.isTryingToRevive() != tryingToInteract) {
-                savior.setTryingToRevive(tryingToInteract);
-                LIFe.getNetman().sendToServer(new RevivalInputMessage(tryingToInteract));
+        if (player != null) {
+            if (player.getHealth() <= 0.0f) {
+                // What does the client do every tick when downed?
+            } else {
+                ISavior savior = player.getCapability(ModCapabilities.SAVIOR, null);
+                boolean tryingToInteract = Minecraft.getMinecraft().gameSettings.keyBindUseItem.isKeyDown();
+                if (savior.isTryingToRevive() != tryingToInteract) {
+                    savior.setTryingToRevive(tryingToInteract);
+                    LIFe.getNetman().sendToServer(new RevivalInputMessage(tryingToInteract));
+                }
             }
         }
-
-
     }
 }

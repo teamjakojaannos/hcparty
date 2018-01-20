@@ -5,10 +5,14 @@ import jakojaannos.life.api.revival.capability.IUnconsciousHandler;
 import jakojaannos.life.api.revival.event.UnconsciousEvent;
 import jakojaannos.life.init.ModCapabilities;
 import jakojaannos.life.network.messages.ClientMessageHandler;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGameOver;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class DieMessage implements IMessage {
     private int entityId;
@@ -33,15 +37,21 @@ public class DieMessage implements IMessage {
 
     public static class Handler extends ClientMessageHandler<DieMessage> {
         @Override
-        protected void onMessage(DieMessage message) {
-            getMainThread().addScheduledTask(() -> {
+        public IMessage onMessage(DieMessage message, MessageContext ctx) {
+            getMainThread(ctx).addScheduledTask(() -> {
                 Entity entity = getPlayerEntity().world.getEntityByID(message.entityId);
                 if (entity != null && entity instanceof EntityPlayer) {
                     IUnconsciousHandler unconsciousHandler = entity.getCapability(ModCapabilities.UNCONSCIOUS_HANDLER, null);
-                    entity.setDead();
-                    MinecraftForge.EVENT_BUS.post(new UnconsciousEvent.Died((EntityPlayer) entity, unconsciousHandler));
+                    if (unconsciousHandler != null) {
+                        unconsciousHandler.setTimer(unconsciousHandler.getDuration());
+                        entity.setDead();
+                        MinecraftForge.EVENT_BUS.post(new UnconsciousEvent.Died((EntityPlayer) entity, unconsciousHandler));
+                        Minecraft.getMinecraft().displayGuiScreen(new GuiGameOver(new TextComponentTranslation("yeee.yeee.asd")));
+                    }
                 }
             });
+
+            return null;
         }
     }
 }

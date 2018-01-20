@@ -7,9 +7,14 @@ import jakojaannos.life.network.messages.ClientMessageHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class RevivalFailedMessage implements IMessage {
     private int savior;
+
+    public RevivalFailedMessage() {
+        this(-1);
+    }
 
     public RevivalFailedMessage(int savior) {
         this.savior = savior;
@@ -27,8 +32,8 @@ public class RevivalFailedMessage implements IMessage {
 
     public static class Handler extends ClientMessageHandler<RevivalFailedMessage> {
         @Override
-        protected void onMessage(RevivalFailedMessage message) {
-            getMainThread().addScheduledTask(() -> {
+        public IMessage onMessage(RevivalFailedMessage message, MessageContext ctx) {
+            getMainThread(ctx).addScheduledTask(() -> {
                 final World world = getPlayerEntity().world;
                 final Entity saviorEntity = world.getEntityByID(message.savior);
 
@@ -43,6 +48,8 @@ public class RevivalFailedMessage implements IMessage {
                     }
                 }
             });
+
+            return null;
         }
     }
 }

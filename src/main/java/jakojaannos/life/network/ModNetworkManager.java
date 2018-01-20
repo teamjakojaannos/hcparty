@@ -26,6 +26,9 @@ public final class ModNetworkManager {
         wrapper.registerMessage(DownedMessage.Handler.class, DownedMessage.class, index++, Side.CLIENT);
         wrapper.registerMessage(FallUnconsciousMessage.Handler.class, FallUnconsciousMessage.class, index++, Side.CLIENT);
 
+        wrapper.registerMessage(BleedoutHealthMessage.Handler.class, BleedoutHealthMessage.class, index++, Side.CLIENT);
+        wrapper.registerMessage(BleedoutTimeMessage.Handler.class, BleedoutTimeMessage.class, index++, Side.CLIENT);
+
         wrapper.registerMessage(RevivalInputMessage.Handler.class, RevivalInputMessage.class, index++, Side.SERVER);
     }
 

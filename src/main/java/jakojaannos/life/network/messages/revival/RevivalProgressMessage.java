@@ -7,6 +7,7 @@ import jakojaannos.life.network.messages.ClientMessageHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class RevivalProgressMessage implements IMessage {
     private int targetEntityId;
@@ -35,8 +36,8 @@ public class RevivalProgressMessage implements IMessage {
 
     public static class Handler extends ClientMessageHandler<RevivalProgressMessage> {
         @Override
-        public void onMessage(RevivalProgressMessage message) {
-            getMainThread().addScheduledTask(() -> {
+        public IMessage onMessage(RevivalProgressMessage message, MessageContext ctx) {
+            getMainThread(ctx).addScheduledTask(() -> {
                 if (message.targetEntityId != -1) {
                     final World world = getPlayerEntity().getEntityWorld();
                     final Entity target = world.getEntityByID(message.targetEntityId);
@@ -48,6 +49,8 @@ public class RevivalProgressMessage implements IMessage {
                     }
                 }
             });
+
+            return null;
         }
     }
 }

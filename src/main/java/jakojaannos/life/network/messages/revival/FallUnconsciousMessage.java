@@ -9,38 +9,49 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class FallUnconsciousMessage implements IMessage {
     private int entityId;
+    private int duration;
 
     public FallUnconsciousMessage() {
-        this(-1);
+        this(-1, 0);
     }
 
-    public FallUnconsciousMessage(int entityId) {
+    public FallUnconsciousMessage(int entityId, int duration) {
         this.entityId = entityId;
+        this.duration = duration;
     }
 
     @Override
     public void fromBytes(ByteBuf buf) {
         this.entityId = buf.readInt();
+        this.duration = buf.readInt();
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
         buf.writeInt(entityId);
+        buf.writeInt(duration);
     }
 
     public static class Handler extends ClientMessageHandler<FallUnconsciousMessage> {
         @Override
-        protected void onMessage(FallUnconsciousMessage message) {
-            getMainThread().addScheduledTask(() -> {
+        public IMessage onMessage(FallUnconsciousMessage message, MessageContext ctx) {
+            getMainThread(ctx).addScheduledTask(() -> {
                 Entity entity = getPlayerEntity().world.getEntityByID(message.entityId);
                 if (entity != null && entity instanceof EntityPlayer) {
                     IUnconsciousHandler unconsciousHandler = entity.getCapability(ModCapabilities.UNCONSCIOUS_HANDLER, null);
-                    MinecraftForge.EVENT_BUS.post(new UnconsciousEvent.FallUnconscious((EntityPlayer) entity, unconsciousHandler));
+                    if (unconsciousHandler != null) {
+                        unconsciousHandler.setDuration(message.duration);
+                        unconsciousHandler.resetTimer();
+                        MinecraftForge.EVENT_BUS.post(new UnconsciousEvent.FallUnconscious((EntityPlayer) entity, unconsciousHandler));
+                    }
                 }
             });
+
+            return null;
         }
     }
 }

@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiGameOver;
+import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.client.event.GuiOpenEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -45,10 +46,10 @@ class GuiEventHandler {
     }
 
     private static boolean isAllowedForBleedingOut(Gui gui) {
-        return gui instanceof GuiChat;
+        return gui instanceof GuiChat || gui instanceof GuiIngame;
     }
 
     private static boolean isAllowedForUnconscious(Gui gui) {
-        return gui instanceof GuiChat;
+        return gui instanceof GuiChat || gui instanceof GuiIngame;
     }
 }

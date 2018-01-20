@@ -37,7 +37,7 @@ public class RescueEventHandler {
     }
 
     private static void onUpdate(EntityPlayer entity) {
-        Preconditions.checkState(entity.world.isRemote, "RescueEventHandler::onUpdate() should not execute on client!");
+        Preconditions.checkState(!entity.world.isRemote, "RescueEventHandler::onUpdate() should not execute on client!");
 
         ISavior savior = entity.getCapability(ModCapabilities.SAVIOR, null);
         if (savior != null) {

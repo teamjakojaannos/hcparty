@@ -40,6 +40,10 @@ public class DeathEventHandler {
      */
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        if (event.player.isDead) {
+            return;
+        }
+
         if (event.phase == TickEvent.Phase.START && event.player.getHealth() <= 0) {
             // 19th tick is the last tick, by incrementing the value to 20 vanilla will set the value to 21 which makes
             // the removal condition (deathTime == 20) return false, preventing the removal of the entity.

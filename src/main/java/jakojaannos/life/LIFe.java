@@ -34,6 +34,7 @@ public class LIFe {
     @EventHandler
     public void onInit(FMLPreInitializationEvent event) {
         ModCapabilities.initCapabilities();
+        proxy.onInit(event);
     }
 
     @EventHandler

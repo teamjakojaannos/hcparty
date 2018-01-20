@@ -9,6 +9,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class DownedMessage implements IMessage {
     private int entityId;
@@ -33,14 +34,16 @@ public class DownedMessage implements IMessage {
 
     public static class Handler extends ClientMessageHandler<DownedMessage> {
         @Override
-        protected void onMessage(DownedMessage message) {
-            getMainThread().addScheduledTask(() -> {
+        public IMessage onMessage(DownedMessage message, MessageContext ctx) {
+            getMainThread(ctx).addScheduledTask(() -> {
                 Entity entity = getPlayerEntity().world.getEntityByID(message.entityId);
                 if (entity != null && entity instanceof EntityPlayer) {
                     IBleedoutHandler bleedoutHandler = entity.getCapability(ModCapabilities.BLEEDOUT_HANDLER, null);
                     MinecraftForge.EVENT_BUS.post(new BleedoutEvent.Downed((EntityPlayer) entity, bleedoutHandler));
                 }
             });
+
+            return null;
         }
     }
 }

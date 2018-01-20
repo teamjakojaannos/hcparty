@@ -1,6 +1,5 @@
 package jakojaannos.life.network.messages;
 
-import com.google.common.base.Preconditions;
 import net.minecraft.util.IThreadListener;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -9,29 +8,12 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public abstract class MessageHandler<TMessage extends IMessage> implements IMessageHandler<TMessage, IMessage> {
-    private MessageContext ctx;
-
-    protected MessageContext getContext() {
-        Preconditions.checkNotNull(ctx);
-        return ctx;
+    protected final IThreadListener getMainThread(MessageContext ctx) {
+        return ctx.side == Side.SERVER ? getServerMainThread(ctx) : getClientMainThread();
     }
 
-    @Override
-    public final IMessage onMessage(TMessage message, MessageContext ctx) {
-        this.ctx = ctx;
-        onMessage(message);
-        this.ctx = null;
-        return null;
-    }
-
-    protected abstract void onMessage(TMessage message);
-
-    protected final IThreadListener getMainThread() {
-        return this.ctx.side == Side.SERVER ? getServerMainThread() : getClientMainThread();
-    }
-
-    private IThreadListener getServerMainThread() {
-        return this.ctx.getServerHandler().player.getServerWorld();
+    private IThreadListener getServerMainThread(MessageContext ctx) {
+        return ctx.getServerHandler().player.getServerWorld();
     }
 
     @SideOnly(Side.CLIENT)

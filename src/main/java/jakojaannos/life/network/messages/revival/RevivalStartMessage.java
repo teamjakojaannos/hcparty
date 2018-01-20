@@ -8,6 +8,7 @@ import jakojaannos.life.network.messages.ClientMessageHandler;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class RevivalStartMessage implements IMessage {
     private int savior;
@@ -36,8 +37,8 @@ public class RevivalStartMessage implements IMessage {
 
     public static class Handler extends ClientMessageHandler<RevivalStartMessage> {
         @Override
-        protected void onMessage(RevivalStartMessage message) {
-            getMainThread().addScheduledTask(() -> {
+        public IMessage onMessage(RevivalStartMessage message, MessageContext ctx) {
+            getMainThread(ctx).addScheduledTask(() -> {
                 final World world = getPlayerEntity().world;
                 final Entity saviorEntity = world.getEntityByID(message.savior);
                 final Entity targetEntity = world.getEntityByID(message.target);
@@ -51,6 +52,8 @@ public class RevivalStartMessage implements IMessage {
                     }
                 }
             });
+
+            return null;
         }
     }
 }

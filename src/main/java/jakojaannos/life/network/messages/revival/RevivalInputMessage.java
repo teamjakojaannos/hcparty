@@ -5,6 +5,7 @@ import jakojaannos.life.api.revival.capability.ISavior;
 import jakojaannos.life.init.ModCapabilities;
 import jakojaannos.life.network.messages.ServerMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class RevivalInputMessage implements IMessage {
     private boolean tryingToInteract;
@@ -30,13 +31,15 @@ public class RevivalInputMessage implements IMessage {
 
     public static class Handler extends ServerMessageHandler<RevivalInputMessage> {
         @Override
-        protected void onMessage(RevivalInputMessage message) {
-            getMainThread().addScheduledTask(() -> {
-                ISavior savior = getSenderEntity().getCapability(ModCapabilities.SAVIOR, null);
+        public IMessage onMessage(RevivalInputMessage message, MessageContext ctx) {
+            getMainThread(ctx).addScheduledTask(() -> {
+                ISavior savior = getSenderEntity(ctx).getCapability(ModCapabilities.SAVIOR, null);
                 if (savior != null) {
                     savior.setTryingToRevive(message.tryingToInteract);
                 }
             });
+
+            return null;
         }
     }
 }

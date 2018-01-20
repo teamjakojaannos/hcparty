@@ -71,7 +71,7 @@ public class ConfigRevival {
 
 
         @Comment("Default health player has when bleeding out")
-        public float defaultMaxHealth = 100.0f;
+        public float defaultMaxHealth = 10.0f;
 
         @Comment("Maximum value maximum bleedout health can increased to by modifiers")
         public float maxHealth = Float.MAX_VALUE;
@@ -151,7 +151,7 @@ public class ConfigRevival {
     public static class Unconscious {
         @Comment("Time the player may spend unconscious before dying")
         @RequiresWorldRestart
-        public int duration = 3 * 20 * 60; // 3 minutes
+        public int duration = 20 * 10; // 30 seconds
     }
 
 
