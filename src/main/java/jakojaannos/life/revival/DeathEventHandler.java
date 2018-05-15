@@ -84,42 +84,46 @@ public class DeathEventHandler {
 
         IBleedoutHandler bleedoutHandler = entity.getCapability(ModCapabilities.BLEEDOUT_HANDLER, null);
         IUnconsciousHandler unconsciousHandler = entity.getCapability(ModCapabilities.UNCONSCIOUS_HANDLER, null);
-        if (bleedoutHandler != null && unconsciousHandler != null) {
-            int bleedoutCount = bleedoutHandler.getBleedoutCount() + 1;
 
-            // If bleedout counter is capped out, die instantly instead of going down
-            if (bleedoutCount > bleedoutHandler.getBleedoutCounterMax()) {
-                bleedoutHandler.setBleedoutHealth(0);
-                unconsciousHandler.setTimer(unconsciousHandler.getDuration());
+        // Let the event pass if we should be dead already
+        if (bleedoutHandler == null || unconsciousHandler == null || unconsciousHandler.getTimer() == unconsciousHandler.getDuration()) {
+            return;
+        }
+
+        int bleedoutCount = bleedoutHandler.getBleedoutCount() + 1;
+
+        // If bleedout counter is capped out, die instantly instead of going down
+        if (bleedoutCount > bleedoutHandler.getBleedoutCounterMax()) {
+            bleedoutHandler.setBleedoutHealth(0);
+            unconsciousHandler.setTimer(unconsciousHandler.getDuration());
+        }
+        // Enter bleedout
+        else {
+            // Increase counter and set health
+            bleedoutHandler.setBleedoutCount(bleedoutCount);
+            bleedoutHandler.setBleedoutHealth(bleedoutHandler.getMaxBleedoutHealth());
+            bleedoutHandler.resetTimer();
+
+            unconsciousHandler.resetTimer();
+
+            // Cancel the event to prevent the player from dying
+            event.setCanceled(true);
+
+            // Handle "death" messages
+            EntityPlayerMP player = (EntityPlayerMP) entity;
+            if (ModConfig.revival.sendVanillaDeathMessage) {
+                sendDeathMessage(player, player.getCombatTracker().getDeathMessage());
+            } else {
+                sendDeathMessage(player, new TextComponentTranslation("downed.generic", player.getDisplayName()));
             }
-            // Enter bleedout
-            else {
-                // Increase counter and set health
-                bleedoutHandler.setBleedoutCount(bleedoutCount);
-                bleedoutHandler.setBleedoutHealth(bleedoutHandler.getMaxBleedoutHealth());
-                bleedoutHandler.resetTimer();
 
-                unconsciousHandler.resetTimer();
-
-                // Cancel the event to prevent the player from dying
-                event.setCanceled(true);
-
-                // Handle "death" messages
-                EntityPlayerMP player = (EntityPlayerMP) entity;
-                if (ModConfig.revival.sendVanillaDeathMessage) {
-                    sendDeathMessage(player, player.getCombatTracker().getDeathMessage());
-                } else {
-                    sendDeathMessage(player, new TextComponentTranslation("downed.generic", player.getDisplayName()));
-                }
-
-                // Make stuff glow like Litvinenko's breakfast
-                if (ModConfig.revival.renderOutlines) {
-                    player.setGlowing(true);
-                }
-
-                MinecraftForge.EVENT_BUS.post(new BleedoutEvent.Downed(player, bleedoutHandler));
-                LIFe.getNetman().sendToDimension(new DownedMessage(player.getEntityId()), player.dimension);
+            // Make stuff glow like Litvinenko's breakfast
+            if (ModConfig.revival.renderOutlines) {
+                player.setGlowing(true);
             }
+
+            MinecraftForge.EVENT_BUS.post(new BleedoutEvent.Downed(player, bleedoutHandler));
+            LIFe.getNetman().sendToDimension(new DownedMessage(player.getEntityId()), player.dimension);
         }
     }
 

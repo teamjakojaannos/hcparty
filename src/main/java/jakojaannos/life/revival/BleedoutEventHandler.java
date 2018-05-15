@@ -21,6 +21,7 @@ import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -213,6 +214,7 @@ public class BleedoutEventHandler {
                 LOGGER.info("{} is dying after being unconscious for too long!", player.getDisplayNameString());
                 player.setDead();
                 MinecraftForge.EVENT_BUS.post(new UnconsciousEvent.Died(player, unconsciousHandler));
+                MinecraftForge.EVENT_BUS.post(new LivingDeathEvent(player, IBleedoutHandler.DAMAGE_BLEEDOUT));
                 LIFe.getNetman().sendToDimension(new DieMessage(player.getEntityId()), player.dimension);
             }
         }

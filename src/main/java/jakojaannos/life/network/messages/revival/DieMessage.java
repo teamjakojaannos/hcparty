@@ -1,6 +1,7 @@
 package jakojaannos.life.network.messages.revival;
 
 import io.netty.buffer.ByteBuf;
+import jakojaannos.life.api.revival.capability.IBleedoutHandler;
 import jakojaannos.life.api.revival.capability.IUnconsciousHandler;
 import jakojaannos.life.api.revival.event.UnconsciousEvent;
 import jakojaannos.life.init.ModCapabilities;
@@ -11,6 +12,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
@@ -46,7 +48,8 @@ public class DieMessage implements IMessage {
                         unconsciousHandler.setTimer(unconsciousHandler.getDuration());
                         entity.setDead();
                         MinecraftForge.EVENT_BUS.post(new UnconsciousEvent.Died((EntityPlayer) entity, unconsciousHandler));
-                        Minecraft.getMinecraft().displayGuiScreen(new GuiGameOver(new TextComponentTranslation("yeee.yeee.asd")));
+                        MinecraftForge.EVENT_BUS.post(new LivingDeathEvent((EntityPlayer) entity, IBleedoutHandler.DAMAGE_BLEEDOUT));
+                        Minecraft.getMinecraft().displayGuiScreen(new GuiGameOver(new TextComponentTranslation("death.attack.life_bleedout", entity.getName())));
                     }
                 }
             });
