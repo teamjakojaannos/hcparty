@@ -34,7 +34,7 @@ public interface IUnconsciousHandler {
     /**
      * Increases timer value by one
      */
-    default void tickTimer() {
+    default void updateTimer() {
         setTimer(getTimer() + 1);
     }
 }

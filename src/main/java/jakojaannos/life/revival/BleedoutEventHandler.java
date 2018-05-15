@@ -128,19 +128,26 @@ public class BleedoutEventHandler {
      */
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        // Only run during Phase.START on server-side
+        if (event.side != Side.SERVER || event.phase != TickEvent.Phase.START) {
+            return;
+        }
+
+        // Do nothing for alive players
         EntityPlayer player = event.player;
-        if (event.phase != TickEvent.Phase.START || event.side != Side.SERVER || player.getHealth() > 0.0f || player.isDead) {
+        if (player.getHealth() > 0.0f || player.isDead) {
             return;
         }
 
         IBleedoutHandler bleedoutHandler = player.getCapability(ModCapabilities.BLEEDOUT_HANDLER, null);
         if (bleedoutHandler != null) {
+            // Run unconscious tick if player has fallen unconscious
             if (bleedoutHandler.getBleedoutHealth() <= 0.0f) {
                 unconsciousTick(player);
                 return;
             }
 
-            bleedoutHandler.tickTimer();
+            bleedoutHandler.updateTimer();
             int timer = bleedoutHandler.getBleedoutTime();
 
             // Prevent applying damage if the config flag is set
@@ -151,7 +158,9 @@ public class BleedoutEventHandler {
             }
 
             // Do damage instances at configured interval
-            if (timer % ModConfig.revival.bleedout.damageInterval == 0 && canHurt) {
+            while (timer > ModConfig.revival.bleedout.damageInterval && canHurt) {
+                timer -= ModConfig.revival.bleedout.damageInterval;
+
                 float damage = ModConfig.revival.bleedout.damagePerInstance;
                 float resistance = bleedoutHandler.getBleedoutResistance();
                 BleedoutEvent.Damage damageEvent = new BleedoutEvent.Damage(player, bleedoutHandler, damage, resistance);
@@ -197,7 +206,7 @@ public class BleedoutEventHandler {
             }
 
             if (!skipTick) {
-                unconsciousHandler.tickTimer();
+                unconsciousHandler.updateTimer();
             }
 
             if (unconsciousHandler.getTimer() > unconsciousHandler.getDuration()) {

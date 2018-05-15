@@ -55,7 +55,7 @@ public interface IBleedoutHandler {
 
     void setBleedoutTime(int time);
 
-    default void tickTimer() {
+    default void updateTimer() {
         setBleedoutTime(getBleedoutTime() + 1);
     }
 
