@@ -1,6 +1,7 @@
 package jakojaannos.life.revival;
 
 import jakojaannos.life.LIFe;
+import jakojaannos.life.ModInfo;
 import jakojaannos.life.api.revival.capability.IBleedoutHandler;
 import jakojaannos.life.api.revival.capability.IUnconsciousHandler;
 import jakojaannos.life.api.revival.event.BleedoutEvent;
@@ -20,12 +21,15 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 // TODO: Block GuiGameOver opening (may generate a ton of garbage as new GUI instances get spawned every frame, consider some dirty workaround)
 
 
 @EventBusSubscriber
 public class DeathEventHandler {
+    private static final Logger LOGGER = LogManager.getLogger(ModInfo.MODID);
 
     /**
      * HACK: Prevents player entity from getting removed due to deathTime
@@ -86,7 +90,7 @@ public class DeathEventHandler {
         IUnconsciousHandler unconsciousHandler = entity.getCapability(ModCapabilities.UNCONSCIOUS_HANDLER, null);
 
         // Let the event pass if we should be dead already
-        if (bleedoutHandler == null || unconsciousHandler == null || unconsciousHandler.getTimer() == unconsciousHandler.getDuration()) {
+        if (bleedoutHandler == null || unconsciousHandler == null || (bleedoutHandler.hasBledOut() && unconsciousHandler.shouldBeDead())) {
             return;
         }
 
@@ -95,7 +99,7 @@ public class DeathEventHandler {
         // If bleedout counter is capped out, die instantly instead of going down
         if (bleedoutCount > bleedoutHandler.getBleedoutCounterMax()) {
             bleedoutHandler.setBleedoutHealth(0);
-            unconsciousHandler.setTimer(unconsciousHandler.getDuration());
+            unconsciousHandler.setTimer(unconsciousHandler.getDuration() + 1);
         }
         // Enter bleedout
         else {

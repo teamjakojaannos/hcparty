@@ -27,7 +27,7 @@ class GuiEventHandler {
             IUnconsciousHandler unconsciousHandler = player.getCapability(ModCapabilities.UNCONSCIOUS_HANDLER, null);
             if (bleedoutHandler != null && unconsciousHandler != null) {
                 isBleedingOut = bleedoutHandler.getBleedoutHealth() > 0.0f;
-                isUnconscious = !isBleedingOut && unconsciousHandler.getTimer() < unconsciousHandler.getDuration();
+                isUnconscious = !isBleedingOut && !unconsciousHandler.shouldBeDead();
                 isDead = !isBleedingOut && !isUnconscious;
             }
 

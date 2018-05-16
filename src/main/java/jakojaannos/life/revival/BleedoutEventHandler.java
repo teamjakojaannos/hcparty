@@ -50,7 +50,7 @@ public class BleedoutEventHandler {
 
     private static void redirectDamage(EntityPlayerMP player, float amount, DamageSource source) {
         IBleedoutHandler bleedoutHandler = player.getCapability(ModCapabilities.BLEEDOUT_HANDLER, null);
-        if (bleedoutHandler == null || bleedoutHandler.getBleedoutHealth() <= 0.0f) {
+        if (bleedoutHandler == null || bleedoutHandler.hasBledOut()) {
             return;
         }
 
@@ -77,7 +77,7 @@ public class BleedoutEventHandler {
             bleedoutHandler.setBleedoutHealth(health - damageAmount);
             player.hurtResistantTime = player.maxHurtResistantTime;
 
-            if (bleedoutHandler.getBleedoutHealth() <= 0.0f) {
+            if (bleedoutHandler.hasBledOut()) {
                 fallUnconscious(player);
             }
         }
@@ -143,48 +143,54 @@ public class BleedoutEventHandler {
         IBleedoutHandler bleedoutHandler = player.getCapability(ModCapabilities.BLEEDOUT_HANDLER, null);
         if (bleedoutHandler != null) {
             // Run unconscious tick if player has fallen unconscious
-            if (bleedoutHandler.getBleedoutHealth() <= 0.0f) {
+            if (bleedoutHandler.hasBledOut()) {
                 unconsciousTick(player);
-                return;
-            }
-
-            bleedoutHandler.updateTimer();
-            int timer = bleedoutHandler.getBleedoutTime();
-
-            // Prevent applying damage if the config flag is set
-            boolean canHurt = true;
-            IRevivable revivable = player.getCapability(ModCapabilities.REVIVABLE, null);
-            if (revivable != null && ModConfig.revival.revival.revivingPreventsBleedoutDamage) {
-                canHurt = !revivable.isBeingRevived();
-            }
-
-            // Do damage instances at configured interval
-            while (timer > ModConfig.revival.bleedout.damageInterval && canHurt) {
-                timer -= ModConfig.revival.bleedout.damageInterval;
-
-                float damage = ModConfig.revival.bleedout.damagePerInstance;
-                float resistance = bleedoutHandler.getBleedoutResistance();
-                BleedoutEvent.Damage damageEvent = new BleedoutEvent.Damage(player, bleedoutHandler, damage, resistance);
-                MinecraftForge.EVENT_BUS.post(damageEvent);
-
-                if (damageEvent.getDamage() > 0.0f) {
-                    damage = applyBleedoutResistance(damageEvent.getDamage(), damageEvent.getResistance());
-                    player.attackEntityFrom(IBleedoutHandler.DAMAGE_BLEEDOUT, damage);
-                }
-            }
-
-            // If we have lost all of our bleedout health, fall unconscious
-            if (bleedoutHandler.getBleedoutHealth() <= 0.0f) {
-                fallUnconscious(player);
+            } else {
+                bleedoutTick(player, bleedoutHandler);
             }
         }
     }
 
+    private static void bleedoutTick(EntityPlayer player, IBleedoutHandler bleedoutHandler) {
+        bleedoutHandler.updateTimer();
+        int timer = bleedoutHandler.getBleedoutTime();
+
+        // Prevent applying damage if the config flag is set and someone is reviving the player
+        boolean canHurt = true;
+        IRevivable revivable = player.getCapability(ModCapabilities.REVIVABLE, null);
+        if (revivable != null && ModConfig.revival.revival.revivingPreventsBleedoutDamage) {
+            canHurt = !revivable.isBeingRevived();
+        }
+
+        // Do damage instances at configured interval
+        while (timer > ModConfig.revival.bleedout.damageInterval && canHurt) {
+            timer -= ModConfig.revival.bleedout.damageInterval;
+
+            float damage = ModConfig.revival.bleedout.damagePerInstance;
+            float resistance = bleedoutHandler.getBleedoutResistance();
+            BleedoutEvent.Damage damageEvent = new BleedoutEvent.Damage(player, bleedoutHandler, damage, resistance);
+            MinecraftForge.EVENT_BUS.post(damageEvent);
+
+            if (damageEvent.getDamage() > 0.0f) {
+                damage = applyBleedoutResistance(damageEvent.getDamage(), damageEvent.getResistance());
+                player.attackEntityFrom(IBleedoutHandler.DAMAGE_BLEEDOUT, damage);
+            }
+        }
+
+        // If we have lost all of our bleedout health, fall unconscious
+        if (bleedoutHandler.hasBledOut()) {
+            fallUnconscious(player);
+        }
+    }
+
+    // TODO: To make thins less error-prone, call this only from tick handler (make automatic once-per-life call to the beginning of the bleedout handling)
     private static void fallUnconscious(EntityPlayer player) {
         LOGGER.info("{} is falling unconscious!", player.getDisplayNameString());
 
         IUnconsciousHandler unconsciousHandler = player.getCapability(ModCapabilities.UNCONSCIOUS_HANDLER, null);
         if (unconsciousHandler != null) {
+            unconsciousHandler.setOrientation(player.rotationYaw);
+
             MinecraftForge.EVENT_BUS.post(new UnconsciousEvent.FallUnconscious(player, unconsciousHandler));
             LIFe.getNetman().sendToDimension(new FallUnconsciousMessage(player.getEntityId(), unconsciousHandler.getDuration()), player.dimension);
         }
@@ -210,7 +216,7 @@ public class BleedoutEventHandler {
                 unconsciousHandler.updateTimer();
             }
 
-            if (unconsciousHandler.getTimer() > unconsciousHandler.getDuration()) {
+            if (unconsciousHandler.shouldBeDead()) {
                 LOGGER.info("{} is dying after being unconscious for too long!", player.getDisplayNameString());
                 player.setDead();
                 MinecraftForge.EVENT_BUS.post(new UnconsciousEvent.Died(player, unconsciousHandler));

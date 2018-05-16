@@ -17,9 +17,9 @@ public class PlayerBleedoutHandler implements IBleedoutHandler {
     private int bleedoutCounter;
     private int timer;
 
-    public PlayerBleedoutHandler(EntityPlayer player) {
+    PlayerBleedoutHandler(EntityPlayer player) {
         this.player = player;
-        this.health = 0.0f;
+        this.health = getMaxBleedoutHealth();
         this.bleedoutCounter = 0;
         this.timer = 0;
     }

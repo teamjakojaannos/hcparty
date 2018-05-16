@@ -62,4 +62,8 @@ public interface IBleedoutHandler {
     default void resetTimer() {
         setBleedoutTime(0);
     }
+
+    default boolean hasBledOut() {
+        return getBleedoutHealth() <= 0;
+    }
 }

@@ -45,7 +45,7 @@ public class DieMessage implements IMessage {
                 if (entity != null && entity instanceof EntityPlayer) {
                     IUnconsciousHandler unconsciousHandler = entity.getCapability(ModCapabilities.UNCONSCIOUS_HANDLER, null);
                     if (unconsciousHandler != null) {
-                        unconsciousHandler.setTimer(unconsciousHandler.getDuration());
+                        unconsciousHandler.setTimer(unconsciousHandler.getDuration() + 1);
                         entity.setDead();
                         MinecraftForge.EVENT_BUS.post(new UnconsciousEvent.Died((EntityPlayer) entity, unconsciousHandler));
                         MinecraftForge.EVENT_BUS.post(new LivingDeathEvent((EntityPlayer) entity, IBleedoutHandler.DAMAGE_BLEEDOUT));

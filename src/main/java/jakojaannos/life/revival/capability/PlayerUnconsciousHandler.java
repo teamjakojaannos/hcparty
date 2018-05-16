@@ -6,8 +6,9 @@ import jakojaannos.life.config.ModConfig;
 public class PlayerUnconsciousHandler implements IUnconsciousHandler {
     private int duration;
     private int timer;
+    private float orientation;
 
-    public PlayerUnconsciousHandler() {
+    PlayerUnconsciousHandler() {
         this.timer = 0;
         this.duration = ModConfig.revival.unconscious.duration;
     }
@@ -30,5 +31,16 @@ public class PlayerUnconsciousHandler implements IUnconsciousHandler {
     @Override
     public void setTimer(int time) {
         this.timer = time;
+    }
+
+
+    @Override
+    public float getOrientation() {
+        return orientation;
+    }
+
+    @Override
+    public void setOrientation(float orientation) {
+        this.orientation = orientation;
     }
 }
