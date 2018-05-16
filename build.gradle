@@ -80,6 +80,10 @@ processResources {
     rename '(.+_at.cfg)', 'META-INF/$1'
 }
 
+// TODO: Instead of reobf'ing and containing the API, include the API to the main jar and ship separate API jar for mod development
+//      + doesn't generate the api-jar to the mods directory
+//      + allows depending mods to depend on API jar at compile and still have the classes present at runtime
+//      - might fuck up setting up dependencies if depending mod doesn't have the main jar at runtime (might be able to setup the main jar as runtime dep and api as compile or sth)
 reobf {
     // As only the main jar is normally re-obfuscated, we need to manually mark the API jar for obfuscation
     apiJar {
