@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import jakojaannos.life.CommonProxy;
 import jakojaannos.life.LIFe;
 import jakojaannos.life.api.revival.capability.ISavior;
+import jakojaannos.life.client.revival.BleedoutRenderEventHandler;
 import jakojaannos.life.init.ModCapabilities;
 import jakojaannos.life.network.messages.revival.RevivalInputMessage;
 import net.minecraft.client.Minecraft;
@@ -24,6 +25,7 @@ public class ClientProxy extends CommonProxy {
     public void onInit(FMLPreInitializationEvent event) {
         super.onInit(event);
         MinecraftForge.EVENT_BUS.register(GuiEventHandler.class);
+        MinecraftForge.EVENT_BUS.register(BleedoutRenderEventHandler.class);
     }
 
     @SubscribeEvent

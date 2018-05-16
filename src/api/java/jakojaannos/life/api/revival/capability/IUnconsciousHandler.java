@@ -37,4 +37,20 @@ public interface IUnconsciousHandler {
     default void updateTimer() {
         setTimer(getTimer() + 1);
     }
+
+    default boolean shouldBeDead() {
+        return getTimer() > getDuration();
+    }
+
+
+    /**
+     * Returns the orientation (rotation around the "up" axis) the player was in when they fell unconscious.
+     * Rendering locks the player to this orientation so that they cannot spin while unconscious.
+     */
+    float getOrientation();
+
+    /**
+     * Sets the orientation player will be rendered in while unconscious.
+     */
+    void setOrientation(float orientation);
 }

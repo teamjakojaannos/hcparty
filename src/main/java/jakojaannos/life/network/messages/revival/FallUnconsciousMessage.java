@@ -44,6 +44,7 @@ public class FallUnconsciousMessage implements IMessage {
                 if (entity != null && entity instanceof EntityPlayer) {
                     IUnconsciousHandler unconsciousHandler = entity.getCapability(ModCapabilities.UNCONSCIOUS_HANDLER, null);
                     if (unconsciousHandler != null) {
+                        unconsciousHandler.setOrientation(entity.rotationYaw);
                         unconsciousHandler.setDuration(message.duration);
                         unconsciousHandler.resetTimer();
                         MinecraftForge.EVENT_BUS.post(new UnconsciousEvent.FallUnconscious((EntityPlayer) entity, unconsciousHandler));
